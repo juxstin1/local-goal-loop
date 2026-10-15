@@ -1,0 +1,213 @@
+HANDOFF — Loop Observatory / local goal-loop experiment
+Date: 2026-10-15
+Status: session handed off; prototype failed acceptance; no build job running.
+
+READ THIS FIRST
+
+User wanted the earlier /goal-style engineering loop recovered, connected to a
+local llama.cpp model, its failures audited, and then challenged to build something
+more substantial than tiny fixtures. We chose Loop Observatory: a desktop viewer
+for the actual plans, patches, reviews, and errors of its own construction.
+
+Qwen authored all three implementation files. Codex supplied the idea, brief,
+stubs, tests, repair feedback, orchestration, samples, packaging, and validation.
+This was a heavily supervised experiment. Do not call it an autonomous success.
+Do not silently repair the model output and attribute those changes to Qwen.
+
+Final result: 20/24 tests passed; all 16 parser/metrics checks passed. Actual window
+interaction failed: clicking a card raised TclError for -outline_width, horizontal
+scrolling did not move, and the detail panel remained empty. Programmatic export
+did work, reporting 6 calls for the demo sample. The screenshot confirms overlapping
+headings, poor text contrast, clipped cards, and unused space on the right.
+
+The user saw the window and described it as junk with good bones, then explicitly
+requested this handoff. This turn documents the state; it does not authorize or
+claim another repair attempt. There is no external blocker to future source work.
+The remaining app work is unfinished implementation and validation.
+
+LOCATIONS
+
+Product: C:\Users\juxxs\Desktop\LoopObservatory
+Evidence: C:\Users\juxxs\Desktop\LoopObservatory-build
+Harness: C:\Users\juxxs\Desktop\langgraph\examples\local-graph-engineer
+Earlier isolated harness worktree: C:\Users\juxxs\Desktop\langgraph-harness-fix
+
+Product files:
+  observatory.py      Qwen's final, still-broken Tk interface
+  trace_reader.py     Qwen's repaired JSONL parser
+  trace_metrics.py    Qwen's call-count aggregation
+  BRIEF.md            Original product contracts
+  tests/             Original tests plus later robustness/usability checks
+  samples/demo.jsonl  Real FIX-007 trace from earlier harness evaluation
+  samples/self-build.jsonl  Concatenated actual traces of this app's construction
+  Launch.cmd         Opens the prototype with self-build.jsonl
+  README.txt         Failed-build notice, usage, authorship, limits, summary
+
+Evidence files:
+  build-summary.json       Per-ticket outcomes, timing, tokens, source hashes
+  preview.png              Screenshot of actual final window with demo trace
+  preview-check.json       Click=false, scroll=false, export=6, callback error
+  preview-summary.json     Export from that window check
+  TEST-CORRECTION.md       One host test mistake and Tcl environment failures
+  holdouts-first.json      Independent parser probes before repair
+  holdouts-after-core-repair.json  Subsequent parser checks (some now regressions)
+  failed-final-observatory.py     Preserved earlier failed interface
+  run_ticket.py            Local model driver; writes only per-ticket allowlist
+  check_holdouts.py         Host probes
+  preview.py               Host visible interaction/screenshot check
+  summarize_build.py / package_build.py  Host reporting and packaging
+
+Each ticket directory contains initial.json, trace.jsonl, approvals.jsonl,
+checkpoints.sqlite, result.json, and implementation before/after snapshots.
+These are the primary provenance. Keep them intact.
+
+MEASURED BUILD HISTORY
+
+Ticket               Outcome                  Iterations   Seconds
+CORE                 passed supplied tests    2             50.69
+DESKTOP              passed initial tests     2             82.92
+CORE-REPAIR          passed expanded tests    2             67.33
+DESKTOP-REPAIR       revision cap reached     2            113.40
+DESKTOP-FINAL        review/tool JSON error   incomplete   103.78
+DESKTOP-REBUILD      truncated patch + errors incomplete    61.25
+DESKTOP-REBUILD8K    revision cap reached     2             99.01
+
+Totals: 39 recorded model-call records, 36,376 reported output tokens, 578.38
+seconds summed ticket runtime. This is about 9.6 minutes IN THE LOOP, not total
+human/session time. Internal provider retries may not have separate trace records
+or token accounting. Seven separately launched tickets are not one uninterrupted
+autonomous goal. Each ticket permitted one revision after its first implementation.
+
+First six tickets allowed 4,096 output tokens per call. The clean rewrite hit that
+cap (finish_reason=length); the final ticket allowed 8,192. Increasing the cap
+removed that truncation but did not resolve the remaining implementation bugs.
+The host restored the original UI stub before the clean rewrite, after preserving
+the failed implementation. No host-authored implementation fixes were applied.
+
+Self-build summary: calls=39, errors=4, failed_tests=8, repairs=4,
+output_tokens=36376, roles={plan:12, patch:14, review:13}. These are PER-CALL metrics.
+The repairs field counts packet attempts >1, not code revision cycles. No elapsed
+timestamps are represented by the cards. Do not invent missing timing evidence.
+
+BUGS TO FIX, IF CONTINUING
+
+Owner: next coding agent. Primary artifact: observatory.py. Inputs: current source,
+BRIEF.md, saved final failures, and screenshot. Preserve the model-only baseline
+before edits; label any new host fixes distinctly in the next report.
+
+1. select_event passes outline_width to Canvas.itemconfigure. Tk rectangles use
+   width for outline thickness. Use actual item IDs or tags, preserve fill colors,
+   and only apply rectangle options to rectangles. This currently aborts selection
+   before the detail text gets populated.
+2. _on_canvas_click treats a canvas item ID as an event index and uses widget
+   coordinates without translating through canvasx/canvasy. Use shared per-event
+   tags/bindings for both rectangle and text, or an explicit item-to-index map.
+3. There is no scrollbar. The xscrollcommand callback forces the viewport back to
+   zero. Wire a real horizontal Scrollbar to canvas.xview and its set method back
+   to xscrollcommand. Set scrollregion from all card bounds after drawing; do not
+   overwrite it with the viewport dimensions on Configure. Test all 30 cards.
+4. Title and subtitle occupy the same grid cell. Put them on separate rows, set
+   readable foreground colors, and configure expansion on the containing Frame,
+   not on Canvas/Text children. The header currently lives under root while the
+   canvas/detail live under self, leading to a fragmented layout.
+5. Detail text needs readable foreground, real vertical scrolling, and expansion.
+   Its current yscrollcommand also resets to zero instead of updating a scrollbar.
+6. Import filedialog explicitly. Button handlers currently use tk.filedialog
+   without that import. load_file's missing-file handler calls undefined
+   _update_ui. Handle file errors consistently without stale events/details.
+7. Card coloring looks up role only; error/test-failed statuses are not prioritized.
+   Cards show role alone. Add recorded line/index, status, attempt, or token count
+   if improving usefulness; timestamps require evidence the current trace lacks.
+8. Parser minor limits remain: empty string role is not normalized to unknown;
+   embedded JSON Unicode can display escaped; not every malformed primitive/type
+   combination is covered. Avoid claiming exhaustive robustness from 16 tests.
+
+ACCEPTANCE AND NEXT ACTION
+
+Recommended next action is a deterministic source repair with a clearly separate
+authorship record, if the user wants a working tool. If the user instead wants
+another model experiment, keep the same acceptance checks and report every retry.
+Do not continue spending calls merely because a model review sounds confident.
+
+First command for a future repair session (PowerShell):
+  Set-Location 'C:\Users\juxxs\Desktop\LoopObservatory'
+  & 'C:\Users\juxxs\Desktop\langgraph\examples\local-graph-engineer\.venv\Scripts\python.exe' -m pytest -q tests
+
+Then inspect observatory.py and preserve a baseline before editing. Completion
+requires all 24 current checks passing plus actual visible interaction:
+  - title/subtitle separate and legible at 1000x680; content fills usable width;
+  - click first, middle, and last cards, including text, to show correct details;
+  - scroll a 30-event trace to the last card; role/status colors survive selection;
+  - Open/Export button flows work; exported counts match the loaded trace;
+  - empty/malformed/missing files produce a coherent display, no stale details;
+  - resize and scroll long detail output without callback errors.
+
+Visible validation command (opens a window and captures a screenshot):
+  & 'C:\Users\juxxs\AppData\Local\Programs\Python\Python312\python.exe' 'C:\Users\juxxs\Desktop\LoopObservatory-build\preview.py'
+Preserve the existing preview artifacts or use a new output directory before
+running it after changes: this script currently overwrites preview.* evidence.
+The preview only tests card-body clicks, scrolling, and programmatic export; it
+does not cover native file dialogs or every user acceptance criterion above.
+
+HARNESS FINDINGS AND TEST HONESTY
+
+The initial eight tests were insufficient. Passing them did not prove a usable
+interface. Independent parser probes found nine failures; added tests exposed UI
+omissions. One added test incorrectly demanded that the summary label be a child
+of Observatory rather than anywhere under root. The host corrected that search
+after DESKTOP-REPAIR; the label was present. Original test_core.py and
+test_desktop.py were never changed. See TEST-CORRECTION.md and per-ticket hashes.
+
+Tcl initialization intermittently failed when multiple Tk roots were created in
+one pytest process, both inside and outside the sandbox. Treat this separately
+from code failures. Final recorded 20/24 run had four test FAILURES, not Tcl setup
+errors. The actual screenshot check independently reproduced the click defect.
+
+The tool transport also failed on malformed JSON, and output truncation was a
+real imposed limit. These do not explain away the invalid Tk option, missing
+scrolling, wrong click mapping, or layout defects. The review stage sometimes
+correctly named defects that the next patch left in place.
+
+EARLIER /GOAL HARNESS WORK
+
+Before this build, the local LangGraph harness was audited and patched. The saved
+comparison at:
+  C:\Users\juxxs\Desktop\langgraph\examples\local-graph-engineer\.runtime\2026-10-15-harness-fix\comparison.json
+records original 7/10 fixtures in 299252 ms versus patched 9/10 in 120116 ms, with
+zero malformed responses in that patched fixture run. FIX-007 remained a genuine
+word-count implementation failure. That small-fixture result does not establish
+general app-building ability. Earlier harness validation recorded 115 tests
+passing; it was not rerun for this documentation turn.
+
+Harness controls: host-derived test contract, protected file fingerprints, write
+allowlists and stale-content hashes, schema-constrained plans/patches/reviews,
+registered commands, persisted checkpoints, bounded revisions, and actual zero-exit
+test receipts required for completion. Completion scope is supplied tests only.
+Do not relax tests or fingerprint enforcement to manufacture a pass.
+
+The harness checkout had pre-existing dirty/untracked work. Inspect git status
+before touching it; do not switch branches, stash, reset, or overwrite that work.
+An isolated worktree was used for the earlier harness fixes. Build artifacts here
+are separate from the harness source. No commit or PR was created for this app.
+
+RUNTIME AT HANDOFF
+
+Verified processes still present during this handoff:
+  PID 5676   llama-server
+  PID 20536  pythonw (prototype opened for user with self-build.jsonl)
+Neither was stopped. Reverify identity before any later stop/restart; PIDs can
+be reused. Process presence was checked, not a fresh HTTP health probe.
+
+Server executable: C:\Users\juxxs\Documents\workspace\llamacpp-prebuilt\llama-server.exe
+Model: C:\Users\juxxs\.lmstudio\models\lmstudio-community\Qwen3.5-9B-GGUF\Qwen3.5-9B-Q4_K_M.gguf
+Endpoint: http://127.0.0.1:8089/v1
+Alias: qwen3.5-9b-q4km
+Recorded build: llama.cpp 8683 (d0a6dfeb2)
+Context: 32768; parallel=1; --jinja; --reasoning off; --n-gpu-layers 999;
+--device Vulkan0. Earlier runtime selected the discrete AMD RX 9070 XT.
+Full launch arguments and logs are under harness .runtime\2026-10-15-qwen9b.
+Existing 9B was chosen for continuity; installed Qwen3.5-4B Q4_K_M is the smaller
+memory alternative. Earlier selection recorded Apache-2.0 for both and no API
+usage fees. No model selection or license re-verification occurred in this handoff.
+
+No memory files were updated. This handoff is the continuation artifact.

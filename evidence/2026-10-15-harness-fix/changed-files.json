@@ -1,0 +1,11 @@
+[
+  "README.md",
+  "tests/test_goal_loop.py",
+  "src/graph_engineer/cli.py",
+  "src/graph_engineer/context.py",
+  "src/graph_engineer/graph.py",
+  "src/graph_engineer/model.py",
+  "src/graph_engineer/packets.py",
+  "src/graph_engineer/prompts.py",
+  "tests/test_harness_regressions.py"
+]

@@ -1,0 +1,746 @@
+{
+  "fixture_count": 10,
+  "complete_count": 9,
+  "pass_threshold": 7,
+  "passed": true,
+  "clean_run": false,
+  "malformed_response_count": 0,
+  "checkpoint_path": ".runtime\\harness-fix\\evaluation-traces-92197f31\\checkpoints.sqlite",
+  "verification_scope": "Unchanged registered fixture tests; no general autonomy claim.",
+  "duration_ms": 120116,
+  "results": [
+    {
+      "task": "FIX-001",
+      "final_receipt": {
+        "objective": "Fix add so it returns the arithmetic sum of its two inputs without changing its signature.",
+        "status": "complete",
+        "iterations_completed": 1,
+        "goal_hash": "ebb5b5e12f7dc43563280c9a7f950e4626f146d6533ef2e74a2cb23b52de268f",
+        "goal_contract": {
+          "objective": "Fix add so it returns the arithmetic sum of its two inputs without changing its signature.",
+          "requirements": [
+            {
+              "id": "REQ-001",
+              "statement": "The unchanged registered pytest tests pass for this objective.",
+              "evidence_required": "test:pytest:exit=0"
+            }
+          ],
+          "non_goals": [
+            "Change tests or their expectations",
+            "Claim coverage beyond supplied tests"
+          ],
+          "completion_test": "All registered tests pass unchanged; scope is supplied tests only."
+        },
+        "last_review_hash": "b282d5f0818a50958169a0fe3c2939146c574ebe239e6ed52222b30340d14a0d",
+        "tests": [
+          {
+            "command_id": "pytest",
+            "argv": [
+              "C:\\Users\\juxxs\\Desktop\\langgraph\\examples\\local-graph-engineer\\.venv\\Scripts\\python.exe",
+              "-m",
+              "pytest",
+              "-q"
+            ],
+            "exit_code": 0,
+            "duration_ms": 855,
+            "stdout": ".                                                                        [100%]\n1 passed in 0.01s\n",
+            "stderr": ""
+          }
+        ],
+        "review": {
+          "model_review": {
+            "requirement_results": [
+              {
+                "requirement_id": "REQ-001",
+                "status": "proved",
+                "evidence": [
+                  "test:pytest:exit=0"
+                ],
+                "explanation": "The registered pytest tests pass (exit=0), directly proving REQ-001."
+              }
+            ],
+            "findings": [],
+            "next_action": "All requirements proved, all tests pass. Goal achieved."
+          },
+          "complete": true,
+          "tests_passed": true,
+          "every_requirement_proved": true,
+          "available_evidence": [
+            "file:TASK.md:sha256=d198dc4d5c667741b437e051d71be300b5fcd8f08bb0f6821e886a213b55ffde",
+            "file:solution.py:sha256=0049214146c09e015865e54237ecc4d15c9e043886cb20d1d9c68659bf744bc9",
+            "file:test_solution.py:sha256=b0b4b186c2718ef58c079993ab8a9f25c5d913ffe48ee32b2086e91250a1a35a",
+            "test:pytest:exit=0"
+          ],
+          "verification_scope": "Unchanged registered tests only; coverage is not exhaustive."
+        },
+        "next_action": null
+      },
+      "resulting_source": "def add(left: int, right: int) -> int:\n    return left + right\n",
+      "duration_ms": 7719,
+      "matches_expected_fixture": true,
+      "trace_path": ".runtime\\harness-fix\\evaluation-traces-92197f31\\FIX-001.jsonl",
+      "malformed_response_count": 0
+    },
+    {
+      "task": "FIX-002",
+      "final_receipt": {
+        "objective": "Fix clamp so it limits a value to the inclusive minimum and maximum bounds.",
+        "status": "complete",
+        "iterations_completed": 1,
+        "goal_hash": "6e55d64641fba9264a30189c27034428ee79b79bcd93649782a76f40b9f7e831",
+        "goal_contract": {
+          "objective": "Fix clamp so it limits a value to the inclusive minimum and maximum bounds.",
+          "requirements": [
+            {
+              "id": "REQ-001",
+              "statement": "The unchanged registered pytest tests pass for this objective.",
+              "evidence_required": "test:pytest:exit=0"
+            }
+          ],
+          "non_goals": [
+            "Change tests or their expectations",
+            "Claim coverage beyond supplied tests"
+          ],
+          "completion_test": "All registered tests pass unchanged; scope is supplied tests only."
+        },
+        "last_review_hash": "6c56828695cbd34b82a56363723eb16d8f0b3639ced13ab69baad4a74ade6baf",
+        "tests": [
+          {
+            "command_id": "pytest",
+            "argv": [
+              "C:\\Users\\juxxs\\Desktop\\langgraph\\examples\\local-graph-engineer\\.venv\\Scripts\\python.exe",
+              "-m",
+              "pytest",
+              "-q"
+            ],
+            "exit_code": 0,
+            "duration_ms": 915,
+            "stdout": ".                                                                        [100%]\n1 passed in 0.01s\n",
+            "stderr": ""
+          }
+        ],
+        "review": {
+          "model_review": {
+            "requirement_results": [
+              {
+                "requirement_id": "REQ-001",
+                "status": "proved",
+                "evidence": [
+                  "test:pytest:exit=0"
+                ],
+                "explanation": "The registered pytest tests pass (exit=0), directly proving REQ-001."
+              }
+            ],
+            "findings": [],
+            "next_action": "All requirements proved."
+          },
+          "complete": true,
+          "tests_passed": true,
+          "every_requirement_proved": true,
+          "available_evidence": [
+            "file:TASK.md:sha256=339de9d9ffae1ecd0358118f3e4788a86c34f90684527cf3da0252b591d5b192",
+            "file:solution.py:sha256=d139be0e55bb5a809b3f24674fcaf3e6cd52d9ff1fd5b0a322850aa0db86a6f0",
+            "file:test_solution.py:sha256=bbb38b08decebc773ac1ee5fefa7c9fbbdcd46268fb7405a2c1481e40486cae0",
+            "test:pytest:exit=0"
+          ],
+          "verification_scope": "Unchanged registered tests only; coverage is not exhaustive."
+        },
+        "next_action": null
+      },
+      "resulting_source": "def clamp(value: int, minimum: int, maximum: int) -> int:\n    return max(min(value, maximum), minimum)",
+      "duration_ms": 7882,
+      "matches_expected_fixture": false,
+      "trace_path": ".runtime\\harness-fix\\evaluation-traces-92197f31\\FIX-002.jsonl",
+      "malformed_response_count": 0
+    },
+    {
+      "task": "FIX-003",
+      "final_receipt": {
+        "objective": "Fix is_even so it returns True exactly for integers divisible by two.",
+        "status": "complete",
+        "iterations_completed": 1,
+        "goal_hash": "026ebbfe614dd1fc9f43f380f730fd8a463ad7c67a9bcb83b058fbf5c183b9af",
+        "goal_contract": {
+          "objective": "Fix is_even so it returns True exactly for integers divisible by two.",
+          "requirements": [
+            {
+              "id": "REQ-001",
+              "statement": "The unchanged registered pytest tests pass for this objective.",
+              "evidence_required": "test:pytest:exit=0"
+            }
+          ],
+          "non_goals": [
+            "Change tests or their expectations",
+            "Claim coverage beyond supplied tests"
+          ],
+          "completion_test": "All registered tests pass unchanged; scope is supplied tests only."
+        },
+        "last_review_hash": "5c96f0957c5774d9eb3dd508162088735ffa7029ee9b3c384ea9deb94ca1a5be",
+        "tests": [
+          {
+            "command_id": "pytest",
+            "argv": [
+              "C:\\Users\\juxxs\\Desktop\\langgraph\\examples\\local-graph-engineer\\.venv\\Scripts\\python.exe",
+              "-m",
+              "pytest",
+              "-q"
+            ],
+            "exit_code": 0,
+            "duration_ms": 773,
+            "stdout": ".                                                                        [100%]\n1 passed in 0.01s\n",
+            "stderr": ""
+          }
+        ],
+        "review": {
+          "model_review": {
+            "requirement_results": [
+              {
+                "requirement_id": "REQ-001",
+                "status": "proved",
+                "evidence": [
+                  "test:pytest:exit=0"
+                ],
+                "explanation": "The registered pytest tests pass (exit=0), proving the objective is met."
+              }
+            ],
+            "findings": [],
+            "next_action": "All requirements proved. Ready for completion."
+          },
+          "complete": true,
+          "tests_passed": true,
+          "every_requirement_proved": true,
+          "available_evidence": [
+            "file:TASK.md:sha256=0833f116c999749fdbbe8108e1a38c16c6e69799de37b67551bdf2514bf00285",
+            "file:solution.py:sha256=a7877448c9dd132e46ca2af9ed528d88d78c0806b5a327ecaf3adce807de95d7",
+            "file:test_solution.py:sha256=789f582cf66e0465de92b936058adb2f2b96bd90cd4967f89e5d84d0ff03d165",
+            "test:pytest:exit=0"
+          ],
+          "verification_scope": "Unchanged registered tests only; coverage is not exhaustive."
+        },
+        "next_action": null
+      },
+      "resulting_source": "def is_even(value: int) -> bool:\n    return value % 2 == 0\n",
+      "duration_ms": 8019,
+      "matches_expected_fixture": true,
+      "trace_path": ".runtime\\harness-fix\\evaluation-traces-92197f31\\FIX-003.jsonl",
+      "malformed_response_count": 0
+    },
+    {
+      "task": "FIX-004",
+      "final_receipt": {
+        "objective": "Fix factorial so it returns n factorial for every non-negative integer n.",
+        "status": "complete",
+        "iterations_completed": 1,
+        "goal_hash": "eec032db0d4985920aaec43a30f67c85661635fd8c4affe71cd4f0d7fc48e0b0",
+        "goal_contract": {
+          "objective": "Fix factorial so it returns n factorial for every non-negative integer n.",
+          "requirements": [
+            {
+              "id": "REQ-001",
+              "statement": "The unchanged registered pytest tests pass for this objective.",
+              "evidence_required": "test:pytest:exit=0"
+            }
+          ],
+          "non_goals": [
+            "Change tests or their expectations",
+            "Claim coverage beyond supplied tests"
+          ],
+          "completion_test": "All registered tests pass unchanged; scope is supplied tests only."
+        },
+        "last_review_hash": "cdf65b34709a10bf0d676af642ff910689256b8d146e2d066a2301a78150edb7",
+        "tests": [
+          {
+            "command_id": "pytest",
+            "argv": [
+              "C:\\Users\\juxxs\\Desktop\\langgraph\\examples\\local-graph-engineer\\.venv\\Scripts\\python.exe",
+              "-m",
+              "pytest",
+              "-q"
+            ],
+            "exit_code": 0,
+            "duration_ms": 766,
+            "stdout": ".                                                                        [100%]\n1 passed in 0.01s\n",
+            "stderr": ""
+          }
+        ],
+        "review": {
+          "model_review": {
+            "requirement_results": [
+              {
+                "requirement_id": "REQ-001",
+                "status": "proved",
+                "evidence": [
+                  "test:pytest:exit=0"
+                ],
+                "explanation": "The registered pytest tests pass (exit=0), directly proving REQ-001."
+              }
+            ],
+            "findings": [],
+            "next_action": "All requirements proved, all tests pass. Goal achieved."
+          },
+          "complete": true,
+          "tests_passed": true,
+          "every_requirement_proved": true,
+          "available_evidence": [
+            "file:TASK.md:sha256=46158d8797b5e817673dbd0769d291b6ae01aa4a03030d00eec2a69cb7536d32",
+            "file:solution.py:sha256=b40f8d2fc4e98a4f7f9b1bd26dc004a0b83f5bd89b9f889a845e254ca961f8cf",
+            "file:test_solution.py:sha256=50b1cc088f6d6413964f48b1c8a4c6d5becbfc1e055bc40993c689c59e6a9b8b",
+            "test:pytest:exit=0"
+          ],
+          "verification_scope": "Unchanged registered tests only; coverage is not exhaustive."
+        },
+        "next_action": null
+      },
+      "resulting_source": "def factorial(value: int) -> int:\n    result = 1\n    for item in range(1, value + 1):\n        result *= item\n    return result\n",
+      "duration_ms": 10013,
+      "matches_expected_fixture": true,
+      "trace_path": ".runtime\\harness-fix\\evaluation-traces-92197f31\\FIX-004.jsonl",
+      "malformed_response_count": 0
+    },
+    {
+      "task": "FIX-005",
+      "final_receipt": {
+        "objective": "Fix slugify so surrounding whitespace is removed and internal spaces become hyphens.",
+        "status": "complete",
+        "iterations_completed": 2,
+        "goal_hash": "183c0375a44d6ae8fc2fc8a6fc95181825468eb5088fd126eaca349646bfdc8a",
+        "goal_contract": {
+          "objective": "Fix slugify so surrounding whitespace is removed and internal spaces become hyphens.",
+          "requirements": [
+            {
+              "id": "REQ-001",
+              "statement": "The unchanged registered pytest tests pass for this objective.",
+              "evidence_required": "test:pytest:exit=0"
+            }
+          ],
+          "non_goals": [
+            "Change tests or their expectations",
+            "Claim coverage beyond supplied tests"
+          ],
+          "completion_test": "All registered tests pass unchanged; scope is supplied tests only."
+        },
+        "last_review_hash": "6d253c5f0c43ddff871caccf18250d12e38d6f7db4a6cb533723869d895e1ec9",
+        "tests": [
+          {
+            "command_id": "pytest",
+            "argv": [
+              "C:\\Users\\juxxs\\Desktop\\langgraph\\examples\\local-graph-engineer\\.venv\\Scripts\\python.exe",
+              "-m",
+              "pytest",
+              "-q"
+            ],
+            "exit_code": 0,
+            "duration_ms": 790,
+            "stdout": ".                                                                        [100%]\n1 passed in 0.01s\n",
+            "stderr": ""
+          }
+        ],
+        "review": {
+          "model_review": {
+            "requirement_results": [
+              {
+                "requirement_id": "REQ-001",
+                "status": "proved",
+                "evidence": [
+                  "test:pytest:exit=0"
+                ],
+                "explanation": "The registered pytest tests pass (exit=0), directly proving REQ-001."
+              }
+            ],
+            "findings": [],
+            "next_action": "All requirements proved, all tests pass. Goal achieved."
+          },
+          "complete": true,
+          "tests_passed": true,
+          "every_requirement_proved": true,
+          "available_evidence": [
+            "file:TASK.md:sha256=ede448b9c81383e1902dfee4d9996a2304ffaed2f0939e3c579da56777937b58",
+            "file:solution.py:sha256=b1961468e1b6ed6a93ad5651acde943d38dbbc5e5befee521a0149296146ab1f",
+            "file:test_solution.py:sha256=e6812637d12e721ffd8b26a278695b2fb1cb34cac86bd305a8cfff5ad86f5ece",
+            "test:pytest:exit=0"
+          ],
+          "verification_scope": "Unchanged registered tests only; coverage is not exhaustive."
+        },
+        "next_action": null
+      },
+      "resulting_source": "import re\n\ndef slugify(value: str) -> str:\n    return re.sub(r\" +\", \"-\", value.strip().lower())\n",
+      "duration_ms": 21597,
+      "matches_expected_fixture": false,
+      "trace_path": ".runtime\\harness-fix\\evaluation-traces-92197f31\\FIX-005.jsonl",
+      "malformed_response_count": 0
+    },
+    {
+      "task": "FIX-006",
+      "final_receipt": {
+        "objective": "Fix dedupe so duplicates are removed while the first-seen order is preserved.",
+        "status": "complete",
+        "iterations_completed": 1,
+        "goal_hash": "2549a40a4f89d0c6f5fa5f1edcdb146ca2851bcff56e86fc2830a3fa7b1bf2c3",
+        "goal_contract": {
+          "objective": "Fix dedupe so duplicates are removed while the first-seen order is preserved.",
+          "requirements": [
+            {
+              "id": "REQ-001",
+              "statement": "The unchanged registered pytest tests pass for this objective.",
+              "evidence_required": "test:pytest:exit=0"
+            }
+          ],
+          "non_goals": [
+            "Change tests or their expectations",
+            "Claim coverage beyond supplied tests"
+          ],
+          "completion_test": "All registered tests pass unchanged; scope is supplied tests only."
+        },
+        "last_review_hash": "60f867c1c24e9f36d1ebab03356c76622f62b6a8453b77cd64a60e85b50a0eac",
+        "tests": [
+          {
+            "command_id": "pytest",
+            "argv": [
+              "C:\\Users\\juxxs\\Desktop\\langgraph\\examples\\local-graph-engineer\\.venv\\Scripts\\python.exe",
+              "-m",
+              "pytest",
+              "-q"
+            ],
+            "exit_code": 0,
+            "duration_ms": 756,
+            "stdout": ".                                                                        [100%]\n1 passed in 0.01s\n",
+            "stderr": ""
+          }
+        ],
+        "review": {
+          "model_review": {
+            "requirement_results": [
+              {
+                "requirement_id": "REQ-001",
+                "status": "proved",
+                "evidence": [
+                  "test:pytest:exit=0"
+                ],
+                "explanation": "The registered pytest test passed (exit=0), proving the dedupe implementation works correctly."
+              }
+            ],
+            "findings": [
+              "All requirements proved",
+              "All tests pass",
+              "Implementation uses dict.fromkeys for order-preserving deduplication"
+            ],
+            "next_action": "Goal achieved. All requirements proved and tests pass."
+          },
+          "complete": true,
+          "tests_passed": true,
+          "every_requirement_proved": true,
+          "available_evidence": [
+            "file:TASK.md:sha256=957e6691c8ac504aee40724a6f19d9ecd07ac6f57e91e2d62d4d304d74b83993",
+            "file:solution.py:sha256=fc04629c46daafbe7cac433dcdac9b2f13af1259ff31c25414a398e49b1bf082",
+            "file:test_solution.py:sha256=60dd2b377c312505547081fb14789ee3de75b68434c1b97a52232a9067162d42",
+            "test:pytest:exit=0"
+          ],
+          "verification_scope": "Unchanged registered tests only; coverage is not exhaustive."
+        },
+        "next_action": null
+      },
+      "resulting_source": "def dedupe(values: list[int]) -> list[int]:\n    return list(dict.fromkeys(values))\n",
+      "duration_ms": 8349,
+      "matches_expected_fixture": true,
+      "trace_path": ".runtime\\harness-fix\\evaluation-traces-92197f31\\FIX-006.jsonl",
+      "malformed_response_count": 0
+    },
+    {
+      "task": "FIX-007",
+      "final_receipt": {
+        "objective": "Fix count_words so words are counted case-insensitively.",
+        "status": "revision_cap_reached",
+        "iterations_completed": 2,
+        "goal_hash": "18550510ff713af384a826cd5dc42842bcdc2543ab0602f8cbfff87c2a08a36a",
+        "goal_contract": {
+          "objective": "Fix count_words so words are counted case-insensitively.",
+          "requirements": [
+            {
+              "id": "REQ-001",
+              "statement": "The unchanged registered pytest tests pass for this objective.",
+              "evidence_required": "test:pytest:exit=0"
+            }
+          ],
+          "non_goals": [
+            "Change tests or their expectations",
+            "Claim coverage beyond supplied tests"
+          ],
+          "completion_test": "All registered tests pass unchanged; scope is supplied tests only."
+        },
+        "last_review_hash": "7e341ec6d163953e2ba549e98ca23f801408b128ee27f3b1e6ecd2b09e4eda69",
+        "tests": [
+          {
+            "command_id": "pytest",
+            "argv": [
+              "C:\\Users\\juxxs\\Desktop\\langgraph\\examples\\local-graph-engineer\\.venv\\Scripts\\python.exe",
+              "-m",
+              "pytest",
+              "-q"
+            ],
+            "exit_code": 1,
+            "duration_ms": 920,
+            "stdout": "F                                                                        [100%]\n================================== FAILURES ===================================\n______________________ test_count_words_case_insensitive ______________________\n\n    def test_count_words_case_insensitive():\n>       assert count_words([\"Graph\", \"graph\", \"Loop\"]) == {\"graph\": 2, \"loop\": 1}\nE       AssertionError: assert {'graph': 1, 'loop': 1} == {'graph': 2, 'loop': 1}\nE         \nE         Omitting 1 identical items, use -vv to show\nE         Differing items:\nE         {'graph': 1} != {'graph': 2}\nE         Use -v to get more diff\n\ntest_solution.py:5: AssertionError\n=========================== short test summary info ===========================\nFAILED test_solution.py::test_count_words_case_insensitive - AssertionError: ...\n1 failed in 0.13s\n",
+            "stderr": ""
+          }
+        ],
+        "review": {
+          "model_review": {
+            "requirement_results": [
+              {
+                "requirement_id": "REQ-001",
+                "status": "unproved",
+                "evidence": [
+                  "file:TASK.md:sha256=c4897af6c66192884ac5e8a4cbf4763a751c948e0f9e8eceeb8a506c2a1dcbea",
+                  "file:solution.py:sha256=ecceae5c41afbe98c76a3c3eb8c22eb7df3bc4ba0fb9d951eafb077e642b7cee",
+                  "file:test_solution.py:sha256=bd56760ccd16b424ef2ddd05f85e2915bf1f296263e25c5b474e57e7ca2f5a65",
+                  "test:pytest:exit=1"
+                ],
+                "explanation": "The test fails because count_words currently counts case-sensitively. The implementation needs to be modified to use words.lower() in the dictionary comprehension to ensure case-insensitive counting."
+              }
+            ],
+            "findings": [
+              "The test fails because count_words currently counts case-sensitively. The implementation needs to be modified to use words.lower() in the dictionary comprehension to ensure case-insensitive counting."
+            ],
+            "next_action": "Modify count_words to use words.lower() in the dictionary comprehension to ensure case-insensitive counting."
+          },
+          "complete": false,
+          "tests_passed": false,
+          "every_requirement_proved": false,
+          "available_evidence": [
+            "file:TASK.md:sha256=c4897af6c66192884ac5e8a4cbf4763a751c948e0f9e8eceeb8a506c2a1dcbea",
+            "file:solution.py:sha256=ecceae5c41afbe98c76a3c3eb8c22eb7df3bc4ba0fb9d951eafb077e642b7cee",
+            "file:test_solution.py:sha256=bd56760ccd16b424ef2ddd05f85e2915bf1f296263e25c5b474e57e7ca2f5a65",
+            "test:pytest:exit=1"
+          ],
+          "verification_scope": "Unchanged registered tests only; coverage is not exhaustive."
+        },
+        "next_action": "auto-approved fixture demonstration"
+      },
+      "resulting_source": "def count_words(words: list[str]) -> dict[str, int]:\n    return {word.lower(): words.count(word) for word in words}",
+      "duration_ms": 25610,
+      "matches_expected_fixture": false,
+      "trace_path": ".runtime\\harness-fix\\evaluation-traces-92197f31\\FIX-007.jsonl",
+      "malformed_response_count": 0
+    },
+    {
+      "task": "FIX-008",
+      "final_receipt": {
+        "objective": "Fix parse_bool so common true and false strings are accepted case-insensitively and unknown values raise ValueError.",
+        "status": "complete",
+        "iterations_completed": 1,
+        "goal_hash": "0cc71999474dfe61c95d50e4872c6f8936ea4016424b726a4cc7f5135866e285",
+        "goal_contract": {
+          "objective": "Fix parse_bool so common true and false strings are accepted case-insensitively and unknown values raise ValueError.",
+          "requirements": [
+            {
+              "id": "REQ-001",
+              "statement": "The unchanged registered pytest tests pass for this objective.",
+              "evidence_required": "test:pytest:exit=0"
+            }
+          ],
+          "non_goals": [
+            "Change tests or their expectations",
+            "Claim coverage beyond supplied tests"
+          ],
+          "completion_test": "All registered tests pass unchanged; scope is supplied tests only."
+        },
+        "last_review_hash": "2afc28b4a8ececf123672696b87c598ae0bdfd01bd57ae325bb6ecd7c767aedf",
+        "tests": [
+          {
+            "command_id": "pytest",
+            "argv": [
+              "C:\\Users\\juxxs\\Desktop\\langgraph\\examples\\local-graph-engineer\\.venv\\Scripts\\python.exe",
+              "-m",
+              "pytest",
+              "-q"
+            ],
+            "exit_code": 0,
+            "duration_ms": 868,
+            "stdout": ".                                                                        [100%]\n1 passed in 0.01s\n",
+            "stderr": ""
+          }
+        ],
+        "review": {
+          "model_review": {
+            "requirement_results": [
+              {
+                "requirement_id": "REQ-001",
+                "status": "proved",
+                "evidence": [
+                  "test:pytest:exit=0"
+                ],
+                "explanation": "The registered pytest tests pass (exit=0), directly proving REQ-001."
+              }
+            ],
+            "findings": [],
+            "next_action": "All requirements proved; completion achieved."
+          },
+          "complete": true,
+          "tests_passed": true,
+          "every_requirement_proved": true,
+          "available_evidence": [
+            "file:TASK.md:sha256=b78875c8f6479a0471fd47973b94d976c682b62222e2d9f6fafcbfbd787e1d20",
+            "file:solution.py:sha256=eb3140cda8e34e2da05f775ab29adc8b5f3d83aa6e1b670d3868ba7e9a465848",
+            "file:test_solution.py:sha256=ad76c2493fa9760b3e1ec74b03f23337f5b5dc8df33021008ba9317d307e9ebb",
+            "test:pytest:exit=0"
+          ],
+          "verification_scope": "Unchanged registered tests only; coverage is not exhaustive."
+        },
+        "next_action": null
+      },
+      "resulting_source": "def parse_bool(value: str) -> bool:\n    normalized = value.strip().lower()\n    if normalized in (\"yes\", \"true\", \"1\", \"y\"):\n        return True\n    if normalized in (\"no\", \"false\", \"0\", \"n\"):\n        return False\n    raise ValueError(f\"Unknown boolean value: {value!r}\")",
+      "duration_ms": 10936,
+      "matches_expected_fixture": false,
+      "trace_path": ".runtime\\harness-fix\\evaluation-traces-92197f31\\FIX-008.jsonl",
+      "malformed_response_count": 0
+    },
+    {
+      "task": "FIX-009",
+      "final_receipt": {
+        "objective": "Fix chunks so the input is divided into consecutive lists of the requested size without dropping values.",
+        "status": "complete",
+        "iterations_completed": 1,
+        "goal_hash": "0e35e113f3bf48783ca80c5d486e8b98d30eb131214bcc2c405cb5f5ef9e8a95",
+        "goal_contract": {
+          "objective": "Fix chunks so the input is divided into consecutive lists of the requested size without dropping values.",
+          "requirements": [
+            {
+              "id": "REQ-001",
+              "statement": "The unchanged registered pytest tests pass for this objective.",
+              "evidence_required": "test:pytest:exit=0"
+            }
+          ],
+          "non_goals": [
+            "Change tests or their expectations",
+            "Claim coverage beyond supplied tests"
+          ],
+          "completion_test": "All registered tests pass unchanged; scope is supplied tests only."
+        },
+        "last_review_hash": "b537bef7f4bcca6da636e13a32243f2a3ae7372a39dbfd1f8eb34f5b3dc09f6c",
+        "tests": [
+          {
+            "command_id": "pytest",
+            "argv": [
+              "C:\\Users\\juxxs\\Desktop\\langgraph\\examples\\local-graph-engineer\\.venv\\Scripts\\python.exe",
+              "-m",
+              "pytest",
+              "-q"
+            ],
+            "exit_code": 0,
+            "duration_ms": 884,
+            "stdout": ".                                                                        [100%]\n1 passed in 0.01s\n",
+            "stderr": ""
+          }
+        ],
+        "review": {
+          "model_review": {
+            "requirement_results": [
+              {
+                "requirement_id": "REQ-001",
+                "status": "proved",
+                "evidence": [
+                  "test:pytest:exit=0"
+                ],
+                "explanation": "The registered pytest test passes (exit=0), directly proving REQ-001."
+              }
+            ],
+            "findings": [],
+            "next_action": "All requirements proved, all tests pass. Goal achieved."
+          },
+          "complete": true,
+          "tests_passed": true,
+          "every_requirement_proved": true,
+          "available_evidence": [
+            "file:TASK.md:sha256=9d43fa73aa373dead65e885f70494b7e986f9821c2f8fb934687e893ea4e9f9d",
+            "file:solution.py:sha256=86decaa7caef1cf7059648e85a71d1a120e7840860f9411b50a816df55ad9207",
+            "file:test_solution.py:sha256=5d549968387edaa97cd02ae7c04ebc6817887bdc07f0768c0004ef681f8a6b79",
+            "test:pytest:exit=0"
+          ],
+          "verification_scope": "Unchanged registered tests only; coverage is not exhaustive."
+        },
+        "next_action": null
+      },
+      "resulting_source": "def chunks(values: list[int], size: int) -> list[list[int]]:\n    return [values[index:index + size] for index in range(0, len(values), size)]",
+      "duration_ms": 9520,
+      "matches_expected_fixture": false,
+      "trace_path": ".runtime\\harness-fix\\evaluation-traces-92197f31\\FIX-009.jsonl",
+      "malformed_response_count": 0
+    },
+    {
+      "task": "FIX-010",
+      "final_receipt": {
+        "objective": "Fix median so odd and even length integer sequences return the correct numeric median.",
+        "status": "complete",
+        "iterations_completed": 1,
+        "goal_hash": "19e3c77103816f9407e87f4f683b8102bc7ea8ab194854d52095f624a6884ad5",
+        "goal_contract": {
+          "objective": "Fix median so odd and even length integer sequences return the correct numeric median.",
+          "requirements": [
+            {
+              "id": "REQ-001",
+              "statement": "The unchanged registered pytest tests pass for this objective.",
+              "evidence_required": "test:pytest:exit=0"
+            }
+          ],
+          "non_goals": [
+            "Change tests or their expectations",
+            "Claim coverage beyond supplied tests"
+          ],
+          "completion_test": "All registered tests pass unchanged; scope is supplied tests only."
+        },
+        "last_review_hash": "2cff2f3ed5a2f252fb8036f545d285f2a7ab505f3368c7f33f1f811253b95955",
+        "tests": [
+          {
+            "command_id": "pytest",
+            "argv": [
+              "C:\\Users\\juxxs\\Desktop\\langgraph\\examples\\local-graph-engineer\\.venv\\Scripts\\python.exe",
+              "-m",
+              "pytest",
+              "-q"
+            ],
+            "exit_code": 0,
+            "duration_ms": 788,
+            "stdout": ".                                                                        [100%]\n1 passed in 0.01s\n",
+            "stderr": ""
+          }
+        ],
+        "review": {
+          "model_review": {
+            "requirement_results": [
+              {
+                "requirement_id": "REQ-001",
+                "status": "proved",
+                "evidence": [
+                  "test:pytest:exit=0"
+                ],
+                "explanation": "The registered pytest tests pass (exit=0), directly proving REQ-001."
+              }
+            ],
+            "findings": [
+              "Median function correctly handles both odd and even length sequences.",
+              "All tests pass with exit code 0.",
+              "Requirement REQ-001 is proved by test:pytest:exit=0."
+            ],
+            "next_action": "Goal achieved. All requirements proved, all tests pass, all cited receipts real."
+          },
+          "complete": true,
+          "tests_passed": true,
+          "every_requirement_proved": true,
+          "available_evidence": [
+            "file:TASK.md:sha256=614275dbbf567e942682bcfe0ca734d93fafc50263d7ed640e341a9daa8c4799",
+            "file:solution.py:sha256=954995d84c30ce23f682ce85c2b392529e5adc37491ae03a57956c943003a4f0",
+            "file:test_solution.py:sha256=acf347ce44e2e05af3b69be6fd044923fbccf8afc71e4b44b674b0324f2175f0",
+            "test:pytest:exit=0"
+          ],
+          "verification_scope": "Unchanged registered tests only; coverage is not exhaustive."
+        },
+        "next_action": null
+      },
+      "resulting_source": "def median(values: list[int]) -> float:\n    ordered = sorted(values)\n    n = len(ordered)\n    if n % 2 == 1:\n        return float(ordered[n // 2])\n    else:\n        return float((ordered[n // 2 - 1] + ordered[n // 2]) / 2)",
+      "duration_ms": 10370,
+      "matches_expected_fixture": false,
+      "trace_path": ".runtime\\harness-fix\\evaluation-traces-92197f31\\FIX-010.jsonl",
+      "malformed_response_count": 0
+    }
+  ]
+}

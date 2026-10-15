@@ -1,0 +1,5 @@
+"""Qwen-owned implementation: parse local graph-engineer JSONL traces per BRIEF.md."""
+
+
+def load_trace(path):
+    raise NotImplementedError("Local model must implement load_trace")

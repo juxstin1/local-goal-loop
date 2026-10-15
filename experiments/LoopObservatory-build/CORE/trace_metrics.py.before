@@ -1,0 +1,5 @@
+"""Qwen-owned implementation: calculate recorded-call metrics per BRIEF.md."""
+
+
+def summarize(events):
+    raise NotImplementedError("Local model must implement summarize")

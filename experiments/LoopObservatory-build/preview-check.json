@@ -1,0 +1,8 @@
+{
+  "click_selected_patch": false,
+  "horizontal_scroll_moves": false,
+  "exported_calls": 6,
+  "callback_errors": [
+    "TclError: unknown option \"-outline_width\""
+  ]
+}

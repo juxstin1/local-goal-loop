@@ -1,0 +1,112 @@
+{
+  "passed": 3,
+  "total": 12,
+  "results": [
+    {
+      "name": "non-container response",
+      "passed": false,
+      "error": "AttributeError: 'list' object has no attribute 'get'"
+    },
+    {
+      "name": "non-container usage",
+      "passed": false,
+      "error": "AttributeError: 'str' object has no attribute 'get'"
+    },
+    {
+      "name": "non-container metadata",
+      "passed": false,
+      "error": "AttributeError: 'list' object has no attribute 'get'"
+    },
+    {
+      "name": "non-object tool call",
+      "passed": false,
+      "error": "AttributeError: 'int' object has no attribute 'get'"
+    },
+    {
+      "name": "non-container tests",
+      "passed": false,
+      "error": "TypeError: 'int' object is not iterable"
+    },
+    {
+      "name": "non-integer exit",
+      "passed": false,
+      "expected": {
+        "status": "ok"
+      },
+      "actual": {
+        "status": "test-failed"
+      }
+    },
+    {
+      "name": "invalid role and attempt",
+      "passed": false,
+      "error": "TypeError: '>' not supported between instances of 'str' and 'int'"
+    },
+    {
+      "name": "negative tokens with fallback",
+      "passed": false,
+      "expected": {
+        "tokens": 13
+      },
+      "actual": {
+        "tokens": 0
+      }
+    },
+    {
+      "name": "zero tokens takes precedence",
+      "passed": true,
+      "expected": {
+        "tokens": 0
+      },
+      "actual": {
+        "tokens": 0
+      }
+    },
+    {
+      "name": "non-text content",
+      "passed": false,
+      "expected": {
+        "output": ""
+      },
+      "actual": {
+        "output": [
+          {
+            "text": "hello"
+          }
+        ]
+      }
+    },
+    {
+      "name": "C:\\Users\\juxxs\\Desktop\\LoopObservatory\\samples\\demo.jsonl",
+      "passed": true,
+      "summary": {
+        "calls": 6,
+        "errors": 0,
+        "failed_tests": 2,
+        "repairs": 0,
+        "output_tokens": 1581,
+        "roles": {
+          "plan": 2,
+          "patch": 2,
+          "review": 2
+        }
+      }
+    },
+    {
+      "name": "C:\\Users\\juxxs\\Desktop\\LoopObservatory-build\\CORE\\trace.jsonl",
+      "passed": true,
+      "summary": {
+        "calls": 6,
+        "errors": 0,
+        "failed_tests": 1,
+        "repairs": 0,
+        "output_tokens": 2868,
+        "roles": {
+          "plan": 2,
+          "patch": 2,
+          "review": 2
+        }
+      }
+    }
+  ]
+}

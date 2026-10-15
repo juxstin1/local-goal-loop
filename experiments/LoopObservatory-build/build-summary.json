@@ -1,0 +1,115 @@
+{
+  "model": "Qwen3.5-9B-Q4_K_M",
+  "runtime": "llama.cpp local port 8089",
+  "max_output_tokens_per_call": "4096 initially; 8192 for DESKTOP-REBUILD8K",
+  "outcome": "failed acceptance: 20 of 24 tests passed; visible click and scroll checks failed",
+  "tickets": [
+    {
+      "ticket": "CORE",
+      "max_output_tokens": 4096,
+      "status": "complete",
+      "iterations": 2,
+      "seconds": 50.69,
+      "calls": 6,
+      "output_tokens": 2868,
+      "malformed_responses": 0,
+      "changed_files": [
+        "trace_metrics.py",
+        "trace_reader.py"
+      ],
+      "protected_files_unchanged": true
+    },
+    {
+      "ticket": "DESKTOP",
+      "max_output_tokens": 4096,
+      "status": "complete",
+      "iterations": 2,
+      "seconds": 82.92,
+      "calls": 6,
+      "output_tokens": 5363,
+      "malformed_responses": 0,
+      "changed_files": [
+        "observatory.py"
+      ],
+      "protected_files_unchanged": true
+    },
+    {
+      "ticket": "CORE-REPAIR",
+      "max_output_tokens": 4096,
+      "status": "complete",
+      "iterations": 2,
+      "seconds": 67.33,
+      "calls": 6,
+      "output_tokens": 3216,
+      "malformed_responses": 0,
+      "changed_files": [
+        "trace_reader.py"
+      ],
+      "protected_files_unchanged": true
+    },
+    {
+      "ticket": "DESKTOP-REPAIR",
+      "max_output_tokens": 4096,
+      "status": "revision_cap_reached",
+      "iterations": 2,
+      "seconds": 113.4,
+      "calls": 6,
+      "output_tokens": 7085,
+      "malformed_responses": 0,
+      "changed_files": [
+        "observatory.py"
+      ],
+      "protected_files_unchanged": true
+    },
+    {
+      "ticket": "DESKTOP-FINAL",
+      "max_output_tokens": 4096,
+      "status": "error",
+      "iterations": null,
+      "seconds": 103.78,
+      "calls": 5,
+      "output_tokens": 7338,
+      "malformed_responses": 2,
+      "changed_files": [
+        "observatory.py"
+      ],
+      "protected_files_unchanged": true
+    },
+    {
+      "ticket": "DESKTOP-REBUILD",
+      "max_output_tokens": 4096,
+      "status": "error",
+      "iterations": null,
+      "seconds": 61.25,
+      "calls": 4,
+      "output_tokens": 4706,
+      "malformed_responses": 2,
+      "changed_files": [],
+      "protected_files_unchanged": true
+    },
+    {
+      "ticket": "DESKTOP-REBUILD8K",
+      "max_output_tokens": 8192,
+      "status": "revision_cap_reached",
+      "iterations": 2,
+      "seconds": 99.01,
+      "calls": 6,
+      "output_tokens": 5800,
+      "malformed_responses": 0,
+      "changed_files": [
+        "observatory.py"
+      ],
+      "protected_files_unchanged": true
+    }
+  ],
+  "seconds": 578.38,
+  "calls": 39,
+  "output_tokens": 36376,
+  "authorship": "Qwen authored all three implementation files. Codex supplied brief, stubs, tests, feedback, runner, sample assembly, launcher, and documentation.",
+  "qualification": "Initial ticket passes were insufficient: external probes exposed parsing and usability gaps. Repair tickets used additional tests. This is a supervised build, not an unaided success.",
+  "source_sha256": {
+    "observatory.py": "a3b7ba6aa3287b3d99533be0127f7886f42b7cad94f8ae58a10df0ba64fda45c",
+    "trace_metrics.py": "2185aea32de08071f66144a1592d229ca6231cf18cbb5fd477c883c90ee14051",
+    "trace_reader.py": "afa57fdd86dbdec25ec102b87212df9ba795871f17d9b8d2041934a7c8bfa429"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "summary": {
+    "calls": 6,
+    "errors": 0,
+    "failed_tests": 2,
+    "repairs": 0,
+    "output_tokens": 1581,
+    "roles": {
+      "plan": 2,
+      "patch": 2,
+      "review": 2
+    }
+  },
+  "warnings": []
+}

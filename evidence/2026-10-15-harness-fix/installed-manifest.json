@@ -1,0 +1,11 @@
+{
+  "README.md": "da7480bbd9b611f45703937d39a3906c1db2f8419fbf55af956ec7ea112c63b2",
+  "tests/test_goal_loop.py": "54080950a46636d263ab11054db6e687b35e52be1a147969abc2aa7989c316ad",
+  "src/graph_engineer/cli.py": "f7f95a654cf76ad2b68fb50a03bca9547b031fa587ad8ef9c49eaa10d8c4d2b0",
+  "src/graph_engineer/context.py": "9915a135c1357b1febfcb724ff2ff6bdf88f56cbb0b42b79310de4bdb8a6bd5b",
+  "src/graph_engineer/graph.py": "e101450a09a653476c7328221142592b8813132712d5b20b60edf19f53cbe23e",
+  "src/graph_engineer/model.py": "e7c57029b46b1cae98e1a5e9b017289a75c2cec5ac5ac910238a05b261d8d5d6",
+  "src/graph_engineer/packets.py": "409e7fada17dfccc4ae3596b45aa7de33c71a551d05c11faa607f2f22ad87a6f",
+  "src/graph_engineer/prompts.py": "4fdaf41ee09097792de8ee9fa4ce6df0bc8b7bf750b9fc4bdb4e28f1af14ab7b",
+  "tests/test_harness_regressions.py": "69578cadff53f6b20f29475752a3061ec9bfea63028b0b5a9249704a298200d6"
+}

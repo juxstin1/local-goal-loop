@@ -1,0 +1,28 @@
+{
+  "state": {
+    "objective": "Complete ticket DESKTOP of Loop Observatory exactly as BRIEF.md specifies. Implement all behavior for this ticket in observatory.py. Read the brief, existing source, and tests in the provided context. Make a usable, thoughtful tool with a complete implementation; leave protected files intact. Use compact code that fits the response limit. Run registered pytest and review its receipt.",
+    "repo_root": "C:\\Users\\juxxs\\Desktop\\LoopObservatory",
+    "task_id": "DESKTOP",
+    "thread_id": "observatory-DESKTOP-25590da4-f4ab-4911-ae4d-a90b244205e2",
+    "allowed_write_paths": [
+      "observatory.py"
+    ],
+    "registered_test_ids": [
+      "pytest"
+    ],
+    "cycle_budget": 2,
+    "iteration": 0,
+    "status": "active",
+    "repository_fingerprint": "pending",
+    "events": []
+  },
+  "hashes": {
+    "BRIEF.md": "aaaaf3c633c4e7fea850878b229e37d7bb66583fde1d79ddba07061c38776f50",
+    "observatory.py": "055389569ce5f995a6f4dd35596beb9e14c2f80852163b9a6af64b802d80624b",
+    "trace_metrics.py": "2185aea32de08071f66144a1592d229ca6231cf18cbb5fd477c883c90ee14051",
+    "trace_reader.py": "583b67a1dc9e45e93e6871bb2d22d5305ed7c3957d0392d5cbfb8dc004bbea02",
+    "samples\\demo.jsonl": "3b1eeb592a9be59049deceb33bbdbf8ac25b0fd8c1bd9edea8681686d9b614f2",
+    "tests\\test_core.py": "dd75dd1018d0783840fe61af07a7d4a638858c413a6069aecaec9444fd65e8a4",
+    "tests\\test_desktop.py": "9549fbf199ac72d3f66d3270ec1c9db1f51c0a67d4657422712bd5b3c36ac198"
+  }
+}

@@ -1,0 +1,16 @@
+"""Qwen-owned desktop interface. Implement Observatory and main per BRIEF.md."""
+import tkinter as tk
+
+
+class Observatory(tk.Frame):
+    def __init__(self, root):
+        super().__init__(root)
+        raise NotImplementedError("Local model must implement the interface")
+
+
+def main():
+    raise NotImplementedError("Local model must implement main")
+
+
+if __name__ == "__main__":
+    main()

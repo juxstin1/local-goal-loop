@@ -1,0 +1,172 @@
+{
+  "before": {
+    "fixture_count": 10,
+    "complete_count": 7,
+    "pass_threshold": 7,
+    "duration_ms": 299252
+  },
+  "after": {
+    "fixture_count": 10,
+    "complete_count": 9,
+    "pass_threshold": 7,
+    "duration_ms": 120116,
+    "clean_run": false,
+    "malformed_response_count": 0
+  },
+  "server": {
+    "pid": 5676,
+    "started_at": "2026-10-15T02:44:45.894076+00:00",
+    "server_exe": "C:/Users/juxxs/Documents/workspace/llamacpp-prebuilt/llama-server.exe",
+    "model_path": "C:/Users/juxxs/.lmstudio/models/lmstudio-community/Qwen3.5-9B-GGUF/Qwen3.5-9B-Q4_K_M.gguf",
+    "arguments": [
+      "C:/Users/juxxs/Documents/workspace/llamacpp-prebuilt/llama-server.exe",
+      "--model",
+      "C:/Users/juxxs/.lmstudio/models/lmstudio-community/Qwen3.5-9B-GGUF/Qwen3.5-9B-Q4_K_M.gguf",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "8089",
+      "--alias",
+      "qwen3.5-9b-q4km",
+      "--ctx-size",
+      "32768",
+      "--parallel",
+      "1",
+      "--jinja",
+      "--reasoning",
+      "off",
+      "--n-gpu-layers",
+      "999",
+      "--device",
+      "Vulkan0"
+    ],
+    "endpoint": "http://127.0.0.1:8089/v1",
+    "selection_reason": "Same Qwen3.5-9B Q4_K_M as earlier 8/10 receipt; installed 4B is smaller-memory alternative. Both Apache-2.0; local execution, no API usage fees.",
+    "server_build": "8683 (d0a6dfeb2)",
+    "model_license_sources": [
+      "https://huggingface.co/Qwen/Qwen3.5-9B",
+      "https://huggingface.co/Qwen/Qwen3.5-4B"
+    ]
+  },
+  "fixture_sha256_unchanged": true,
+  "dependency_lock_unchanged": true,
+  "installed_files_match_tested_copy": true,
+  "all_completions_have_zero_exit_tests": true,
+  "all_completions_have_audit": true,
+  "results": [
+    {
+      "task": "FIX-001",
+      "status": "complete",
+      "iterations": 1,
+      "test_exit_codes": [
+        0
+      ]
+    },
+    {
+      "task": "FIX-002",
+      "status": "complete",
+      "iterations": 1,
+      "test_exit_codes": [
+        0
+      ]
+    },
+    {
+      "task": "FIX-003",
+      "status": "complete",
+      "iterations": 1,
+      "test_exit_codes": [
+        0
+      ]
+    },
+    {
+      "task": "FIX-004",
+      "status": "complete",
+      "iterations": 1,
+      "test_exit_codes": [
+        0
+      ]
+    },
+    {
+      "task": "FIX-005",
+      "status": "complete",
+      "iterations": 2,
+      "test_exit_codes": [
+        0
+      ]
+    },
+    {
+      "task": "FIX-006",
+      "status": "complete",
+      "iterations": 1,
+      "test_exit_codes": [
+        0
+      ]
+    },
+    {
+      "task": "FIX-007",
+      "status": "revision_cap_reached",
+      "iterations": 2,
+      "test_exit_codes": [
+        1
+      ]
+    },
+    {
+      "task": "FIX-008",
+      "status": "complete",
+      "iterations": 1,
+      "test_exit_codes": [
+        0
+      ]
+    },
+    {
+      "task": "FIX-009",
+      "status": "complete",
+      "iterations": 1,
+      "test_exit_codes": [
+        0
+      ]
+    },
+    {
+      "task": "FIX-010",
+      "status": "complete",
+      "iterations": 1,
+      "test_exit_codes": [
+        0
+      ]
+    }
+  ],
+  "remaining_failure": "FIX-007: the model lowercased output keys but still counted the original case-sensitive input, then repeated that code on its one revision. pytest failed and completion remained false.",
+  "verification_scope": "One live comparison on the same ten small frozen fixtures; no claim of general repository capability or statistical reliability.",
+  "evaluation_workdir": "C:/Users/juxxs/Desktop/langgraph-harness-fix/examples/local-graph-engineer",
+  "evidence_copy_root": "C:\\Users\\juxxs\\Desktop\\langgraph\\examples\\local-graph-engineer\\.runtime\\2026-10-15-harness-fix",
+  "source_changes": [
+    "README.md",
+    "tests/test_goal_loop.py",
+    "src/graph_engineer/cli.py",
+    "src/graph_engineer/context.py",
+    "src/graph_engineer/graph.py",
+    "src/graph_engineer/model.py",
+    "src/graph_engineer/packets.py",
+    "src/graph_engineer/prompts.py",
+    "tests/test_harness_regressions.py"
+  ],
+  "implementation_notes": [
+    "Host-defined immutable contract uses unchanged registered tests; model no longer generates acceptance requirements.",
+    "Model does not generate expected_sha256; host supplies the approved-context preimage hash.",
+    "File/evidence/test choices appear as schema enums; existing host checks remain authoritative.",
+    "Malformed tool-JSON HTTP 500 responses enter bounded repair; unrelated server exceptions propagate.",
+    "Tests are protected before and after execution. Reviews must cite the required zero-exit test receipt.",
+    "7/10 threshold and one-revision cap retained. clean_run remains false when any fixture fails."
+  ],
+  "server_health": {
+    "status": "ok"
+  },
+  "validation": {
+    "pytest_passed": 115,
+    "pytest_duration_seconds": 24.76,
+    "pytest_warning": "Pytest cache could not write nodeids; test execution passed.",
+    "ruff_check": "passed",
+    "ruff_format_check": "21 files formatted",
+    "git_diff_check": "passed"
+  }
+}

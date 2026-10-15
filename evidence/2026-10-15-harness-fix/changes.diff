@@ -1,0 +1,543 @@
+--- before/README.md
++++ after/README.md
+@@ -8,9 +8,23 @@
+           -> tests -> completion audit -> continue or finish
+ ```
+ 
+-Local model calls create the goal contract, plan, replacement-file proposal,
+-and review. Python code owns repository reads, packet hashes, approvals, writes,
+-test execution, iteration budgets, and the final proof check.
++Python fixes the goal contract from the supplied objective and registered tests.
++The model receives that contract, the existing test source, and write restrictions
++before planning. It proposes plans, replacement files, and reviews; it cannot
++redefine the test expectations or add completion requirements.
++
++Python owns repository reads, original-file hashes, approvals, writes, test
++execution, iteration budgets, and the final proof check. Completion means the
++unchanged registered tests passed and their receipts were cited; it does not
++claim exhaustive coverage of the objective. Protected-file fingerprints are
++checked before and after test execution.
++
++Tool schemas enumerate permitted paths and evidence references. The host fills
++replacement hashes from the approved context. Malformed tool-JSON server errors
++receive bounded corrective retries; unrelated server failures propagate.
++Evaluation saves per-task model traces and SQLite checkpoints beside its receipt.
++The existing `passed` field retains the seven-of-ten threshold; `clean_run`
++additionally requires all ten completions and zero malformed-response errors.
+ 
+ ## Setup
+ 
+--- before/tests/test_goal_loop.py
++++ after/tests/test_goal_loop.py
+@@ -62,7 +62,7 @@
+     assert (fixture_repo / "solution.py").read_text(encoding="utf-8") == fixture_task[
+         "expected_source"
+     ]
+-    assert [call[0] for call in model.calls] == ["goal", "plan", "patch", "review"]
++    assert [call[0] for call in model.calls] == ["plan", "patch", "review"]
+ 
+ 
+ def test_failed_test_routes_through_a_new_context_plan_and_patch(
+@@ -84,7 +84,6 @@
+     assert completed["status"] == "complete"
+     assert completed["iteration"] == 1
+     assert [call[0] for call in model.calls] == [
+-        "goal",
+         "plan",
+         "patch",
+         "review",
+--- before/src/graph_engineer/cli.py
++++ after/src/graph_engineer/cli.py
+@@ -108,12 +108,17 @@
+     tasks = load_tasks()
+     started = time.perf_counter()
+     results: list[dict[str, Any]] = []
++    trace_dir = receipt_path.parent / f"{receipt_path.stem}-traces-{uuid.uuid4().hex[:8]}"
++    trace_dir.mkdir(parents=True, exist_ok=True)
++    malformed_responses = 0
+     with tempfile.TemporaryDirectory(prefix="local-graph-engineer-eval-") as temp:
+         temp_root = Path(temp)
+-        connection = sqlite3.connect(temp_root / "checkpoints.sqlite", check_same_thread=False)
++        connection = sqlite3.connect(trace_dir / "checkpoints.sqlite", check_same_thread=False)
+         try:
+-            graph = build_goal_graph(LocalChatRoleModel(), checkpointer=SqliteSaver(connection))
+             for index, task in enumerate(tasks):
++                trace_path = trace_dir / f"{task['id']}.jsonl"
++                model = LocalChatRoleModel(trace_path=trace_path)
++                graph = build_goal_graph(model, checkpointer=SqliteSaver(connection))
+                 task_started = time.perf_counter()
+                 root = materialize_task(task, temp_root / f"repo-{index:02d}")
+                 try:
+@@ -134,7 +139,11 @@
+                         "duration_ms": round((time.perf_counter() - task_started) * 1000),
+                         "error_type": type(error).__name__,
+                         "error": str(error),
++                        "resulting_source": (root / "solution.py").read_text(encoding="utf-8"),
+                     }
++                malformed_responses += model.malformed_response_count
++                result["trace_path"] = str(trace_path)
++                result["malformed_response_count"] = model.malformed_response_count
+                 results.append(result)
+                 status = result.get("final_receipt", {}).get("status", "error")
+                 print(f"{task['id']}: {status}", flush=True)
+@@ -148,6 +157,10 @@
+         "complete_count": complete,
+         "pass_threshold": 7,
+         "passed": complete >= 7,
++        "clean_run": complete == len(tasks) and malformed_responses == 0,
++        "malformed_response_count": malformed_responses,
++        "checkpoint_path": str(trace_dir / "checkpoints.sqlite"),
++        "verification_scope": "Unchanged registered fixture tests; no general autonomy claim.",
+         "duration_ms": round((time.perf_counter() - started) * 1000),
+         "results": results,
+     }
+--- before/src/graph_engineer/context.py
++++ after/src/graph_engineer/context.py
+@@ -17,12 +17,14 @@
+     return candidate
+ 
+ 
+-def repository_fingerprint(root: Path) -> str:
++def repository_fingerprint(root: Path, *, exclude_paths: tuple[str, ...] = ()) -> str:
+     records: list[tuple[str, str]] = []
+     for path in sorted(root.rglob("*")):
+         if not path.is_file() or any(part in EXCLUDED_PARTS for part in path.parts):
+             continue
+         relative = path.relative_to(root).as_posix()
++        if relative in exclude_paths:
++            continue
+         records.append((relative, hashlib.sha256(path.read_bytes()).hexdigest()))
+     return canonical_hash(records)
+ 
+--- before/src/graph_engineer/graph.py
++++ after/src/graph_engineer/graph.py
+@@ -11,7 +11,12 @@
+ from langgraph.types import interrupt
+ 
+ from graph_engineer.context import build_context, repository_fingerprint, resolve_inside
+-from graph_engineer.execution import apply_replacements, run_registered_test, validate_replacements
++from graph_engineer.execution import (
++    COMMANDS,
++    apply_replacements,
++    run_registered_test,
++    validate_replacements,
++)
+ from graph_engineer.model import LocalChatRoleModel, RoleModel
+ from graph_engineer.packets import (
+     Approval,
+@@ -22,6 +27,7 @@
+     PacketEnvelope,
+     PatchDraft,
+     PlanDraft,
++    Requirement,
+     ReviewDraft,
+     envelope,
+ )
+@@ -40,6 +46,7 @@
+     iteration: int
+     status: str
+     repository_fingerprint: str
++    protected_fingerprint: NotRequired[str]
+     goal: NotRequired[dict[str, Any]]
+     context: NotRequired[dict[str, Any]]
+     plan: NotRequired[dict[str, Any]]
+@@ -107,16 +114,28 @@
+             if not path.is_file() or path.is_symlink():
+                 raise ValueError(f"writable path must be a regular file: {relative}")
+         fingerprint = repository_fingerprint(root)
+-        goal = role_model.invoke(
+-            "goal",
+-            GoalContract,
+-            {
+-                "objective": state["objective"],
+-                "completion_policy": (
+-                    "Every requirement needs direct current-state or test evidence. "
+-                    "Unproved means the goal remains active."
+-                ),
+-            },
++        test_ids = state["registered_test_ids"]
++        if not test_ids or len(test_ids) > 12 or len(set(test_ids)) != len(test_ids):
++            raise ValueError("one to twelve distinct registered tests are required")
++        if not set(test_ids) <= set(COMMANDS):
++            raise ValueError("goal requests an unregistered test")
++        # Acceptance belongs to the host. The model cannot invent requirements or
++        # reinterpret frozen tests before seeing their source in gather_context.
++        goal = GoalContract(
++            objective=state["objective"],
++            requirements=tuple(
++                Requirement(
++                    id=f"REQ-{index:03d}",
++                    statement=f"The unchanged registered {test_id} tests pass for this objective.",
++                    evidence_required=f"test:{test_id}:exit=0",
++                )
++                for index, test_id in enumerate(test_ids, 1)
++            ),
++            non_goals=(
++                "Change tests or their expectations",
++                "Claim coverage beyond supplied tests",
++            ),
++            completion_test="All registered tests pass unchanged; scope is supplied tests only.",
+         )
+         packet = envelope(
+             kind="goal",
+@@ -130,6 +149,9 @@
+             "iteration": 0,
+             "status": "active",
+             "repository_fingerprint": fingerprint,
++            "protected_fingerprint": repository_fingerprint(
++                root, exclude_paths=tuple(state["allowed_write_paths"])
++            ),
+             "goal": packet.model_dump(mode="json"),
+             "events": _event("intake", packet_hash=packet.packet_hash),
+         }
+@@ -186,6 +208,17 @@
+                 if attempt == 1:
+                     raise
+                 payload["validation_feedback"] = str(error)
++                payload["rejected_draft"] = plan.model_dump(mode="json")
++                payload["allowed_evidence_ids"] = sorted(evidence_ids)
++                payload["invalid_evidence_ids"] = sorted(
++                    {ref for step in plan.steps for ref in step.evidence_ids} - evidence_ids
++                )
++                payload["invalid_files"] = sorted(
++                    set(plan.files) - set(state["allowed_write_paths"])
++                )
++                payload["invalid_test_ids"] = sorted(
++                    set(plan.test_ids) - set(state["registered_test_ids"])
++                )
+         else:
+             raise AssertionError(f"unreachable plan repair state: {last_error}")
+         packet = envelope(
+@@ -240,7 +273,7 @@
+                 validate_replacements(
+                     Path(state["repo_root"]),
+                     patch.replacements,
+-                    set(state["allowed_write_paths"]),
++                    set(plan.files),
+                 )
+                 if not set(patch.test_ids) <= set(plan.test_ids):
+                     raise ValueError("patch requests a test outside the approved plan")
+@@ -250,6 +283,8 @@
+                 if attempt == 1:
+                     raise
+                 payload["validation_feedback"] = str(error)
++                payload["rejected_draft"] = patch.model_dump(mode="json")
++                payload["approved_write_paths"] = list(plan.files)
+         else:
+             raise AssertionError(f"unreachable patch repair state: {last_error}")
+         payload = {
+@@ -297,7 +332,9 @@
+             raise ValueError("repository changed after patch approval")
+         patch = PatchDraft.model_validate(expected.payload["draft"])
+         validate_replacements(
+-            Path(state["repo_root"]), patch.replacements, set(state["allowed_write_paths"])
++            Path(state["repo_root"]),
++            patch.replacements,
++            set(PlanDraft.model_validate(_packet(state, "plan").payload).files),
+         )
+         apply_replacements(Path(state["repo_root"]), patch.replacements)
+         fingerprint = repository_fingerprint(Path(state["repo_root"]))
+@@ -307,11 +344,22 @@
+         }
+ 
+     def run_tests(state: GoalLoopState) -> dict[str, Any]:
++        root = Path(state["repo_root"])
++
++        def check_protected_files() -> None:
++            if (
++                repository_fingerprint(root, exclude_paths=tuple(state["allowed_write_paths"]))
++                != state["protected_fingerprint"]
++            ):
++                raise ValueError("protected files changed; test evidence is invalid")
++
++        check_protected_files()
+         patch = PatchDraft.model_validate(_packet(state, "patch").payload["draft"])
+         receipts = [
+             run_registered_test(Path(state["repo_root"]), command_id).model_dump(mode="json")
+             for command_id in patch.test_ids
+         ]
++        check_protected_files()
+         return {
+             "tests": receipts,
+             "events": _event(
+@@ -353,11 +401,12 @@
+             and by_requirement[requirement.id].status == "proved"
+             and bool(by_requirement[requirement.id].evidence)
+             and set(by_requirement[requirement.id].evidence) <= available_evidence
++            and requirement.evidence_required in by_requirement[requirement.id].evidence
+             for requirement in goal.requirements
+         )
+-        tests_passed = bool(state["tests"]) and all(
+-            receipt["exit_code"] == 0 for receipt in state["tests"]
+-        )
++        tests_passed = {receipt["command_id"] for receipt in state["tests"]} == set(
++            state["registered_test_ids"]
++        ) and all(receipt["exit_code"] == 0 for receipt in state["tests"])
+         complete = every_requirement_proved and tests_passed
+         payload = {
+             "model_review": review.model_dump(mode="json"),
+@@ -365,6 +414,7 @@
+             "tests_passed": tests_passed,
+             "every_requirement_proved": every_requirement_proved,
+             "available_evidence": sorted(available_evidence),
++            "verification_scope": "Unchanged registered tests only; coverage is not exhaustive.",
+         }
+         packet = envelope(
+             kind="completion_audit",
+@@ -397,6 +447,7 @@
+             "status": state["status"],
+             "iterations_completed": state["iteration"] + 1,
+             "goal_hash": _packet(state, "goal").packet_hash,
++            "goal_contract": _packet(state, "goal").payload,
+             "last_review_hash": _packet(state, "review").packet_hash if "review" in state else None,
+             "tests": state.get("tests", []),
+             "review": review,
+--- before/src/graph_engineer/model.py
++++ after/src/graph_engineer/model.py
+@@ -1,13 +1,15 @@
+ from __future__ import annotations
+ 
++import json
+ import os
+ from collections import defaultdict, deque
+ from collections.abc import Callable
++from pathlib import Path
+ from typing import Any, Literal, Protocol, TypeVar
+ 
+-from langchain_core.messages import HumanMessage, SystemMessage
++from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
+ from langchain_openai import ChatOpenAI
+-from pydantic import BaseModel
++from pydantic import BaseModel, Field
+ 
+ from graph_engineer.prompts import system_prompt, user_payload
+ 
+@@ -16,7 +18,6 @@
+ 
+ class _WireFileReplacement(BaseModel):
+     path: str
+-    expected_sha256: str
+     content: str
+ 
+ 
+@@ -24,7 +25,7 @@
+     summary: str
+     replacements: list[_WireFileReplacement]
+     test_ids: list[str]
+-    rationale: str
++    rationale: str = Field(description="One short sentence explaining the edit.")
+ 
+ 
+ class _WireRequirementResult(BaseModel):
+@@ -46,13 +47,47 @@
+ }
+ 
+ 
++def wire_tool(role: str, schema: type[BaseModel], payload: dict[str, Any]) -> dict[str, Any]:
++    parameters = schema.model_json_schema()
++    properties = parameters["properties"]
++    if role == "plan":
++        properties["files"]["items"]["enum"] = payload["allowed_write_paths"]
++        properties["test_ids"]["items"]["enum"] = payload["registered_test_ids"]
++        parameters["$defs"]["PlanStep"]["properties"]["evidence_ids"]["items"]["enum"] = [
++            item["id"] for item in payload["context"]["evidence"]
++        ]
++    elif role == "patch":
++        parameters["$defs"]["_WireFileReplacement"]["properties"]["path"]["enum"] = payload[
++            "approved_plan"
++        ]["files"]
++        properties["test_ids"]["items"]["enum"] = payload["approved_plan"]["test_ids"]
++    elif role == "review":
++        requirement = parameters["$defs"]["_WireRequirementResult"]["properties"]
++        requirement["requirement_id"]["enum"] = [
++            item["id"] for item in payload["goal"]["requirements"]
++        ]
++        requirement["evidence"]["items"]["enum"] = payload["available_evidence"]
++    return {"type": "function", "function": {"name": schema.__name__, "parameters": parameters}}
++
++
++def malformed_tool_response(error: Exception) -> bool:
++    text = str(error)
++    return (
++        getattr(error, "status_code", None) == 500 or text.startswith("Error code: 500")
++    ) and "Failed to parse tool call arguments as JSON" in text
++
++
+ class RoleModel(Protocol):
+     def invoke(self, role: str, schema: type[PacketT], payload: dict[str, Any]) -> PacketT: ...
+ 
+ 
+ class LocalChatRoleModel:
+     def __init__(
+-        self, chat_model: Any | None = None, *, packet_attempts: int | None = None
++        self,
++        chat_model: Any | None = None,
++        *,
++        packet_attempts: int | None = None,
++        trace_path: Path | None = None,
+     ) -> None:
+         self._model = chat_model or ChatOpenAI(
+             model=os.getenv("LOCAL_MODEL_NAME", "local"),
+@@ -65,16 +100,28 @@
+             use_responses_api=False,
+             stream_usage=False,
+         )
+-        self._packet_attempts = packet_attempts or int(
+-            os.getenv("LOCAL_MODEL_PACKET_ATTEMPTS", "3")
++        self._packet_attempts = (
++            packet_attempts
++            if packet_attempts is not None
++            else int(os.getenv("LOCAL_MODEL_PACKET_ATTEMPTS", "3"))
+         )
+         if self._packet_attempts < 1:
+             raise ValueError("packet_attempts must be at least one")
++        self.trace_path = trace_path
++        self.malformed_response_count = 0
++
++    def _trace(self, record: dict[str, Any]) -> None:
++        if self.trace_path is not None:
++            self.trace_path.parent.mkdir(parents=True, exist_ok=True)
++            with self.trace_path.open("a", encoding="utf-8") as stream:
++                stream.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")
+ 
+     def invoke(self, role: str, schema: type[PacketT], payload: dict[str, Any]) -> PacketT:
+         wire_schema = WIRE_SCHEMAS.get(role, schema)
+         bound = self._model.bind_tools(
+-            [wire_schema], tool_choice="required", parallel_tool_calls=False
++            [wire_tool(role, wire_schema, payload)],
++            tool_choice="required",
++            parallel_tool_calls=False,
+         )
+         messages = [
+             SystemMessage(content=system_prompt(role)),
+@@ -82,7 +129,41 @@
+         ]
+         last_error: ValueError | None = None
+         for attempt in range(1, self._packet_attempts + 1):
+-            message = bound.invoke(messages)
++            try:
++                message = bound.invoke(messages)
++            except Exception as error:
++                self._trace(
++                    {
++                        "role": role,
++                        "attempt": attempt,
++                        "input": payload,
++                        "error_type": type(error).__name__,
++                        "error": str(error)[:2000],
++                    }
++                )
++                if not malformed_tool_response(error):
++                    raise
++                self.malformed_response_count += 1
++                if attempt == self._packet_attempts:
++                    raise
++                messages.append(
++                    HumanMessage(
++                        content=(
++                            "Your last tool response was malformed or truncated JSON. "
++                            "Return one complete tool call. Use one-sentence explanations. "
++                            "Do not calculate file hashes; the host fills them."
++                        )
++                    )
++                )
++                continue
++            self._trace(
++                {
++                    "role": role,
++                    "attempt": attempt,
++                    "input": payload,
++                    "response": message.model_dump(mode="json"),
++                }
++            )
+             try:
+                 if len(message.tool_calls) != 1:
+                     raise ValueError(
+@@ -96,22 +177,32 @@
+                         f"expected {wire_schema.__name__!r}"
+                     )
+                 value = wire_schema.model_validate(call["args"]).model_dump(mode="json")
++                if role == "patch":
++                    evidence = {item["path"]: item for item in payload["context"]["evidence"]}
++                    for replacement in value["replacements"]:
++                        path = replacement["path"]
++                        if path not in payload["approved_plan"]["files"] or path not in evidence:
++                            raise ValueError(
++                                f"replacement path is not an approved evidence file: {path}"
++                            )
++                        replacement["expected_sha256"] = evidence[path]["sha256"]
+                 return schema.model_validate(value)
+             except ValueError as error:
+                 last_error = error
+                 if attempt == self._packet_attempts:
+                     raise
+-                messages.extend(
+-                    [
+-                        message,
+-                        HumanMessage(
+-                            content=(
+-                                "PACKET VALIDATION FAILED. Return exactly one corrected "
+-                                f"{wire_schema.__name__} tool call. Error: {error}"
+-                            )
+-                        ),
+-                    ]
++                correction = (
++                    "PACKET VALIDATION FAILED. Return exactly one corrected "
++                    f"{wire_schema.__name__} tool call. Error: {error}"
+                 )
++                messages.append(message)
++                if message.tool_calls:
++                    messages.extend(
++                        ToolMessage(content=correction, tool_call_id=call["id"])
++                        for call in message.tool_calls
++                    )
++                else:
++                    messages.append(HumanMessage(content=correction))
+         raise AssertionError(f"unreachable packet retry state: {last_error}")
+ 
+ 
+--- before/src/graph_engineer/packets.py
++++ after/src/graph_engineer/packets.py
+@@ -65,7 +65,11 @@
+ class PlanDraft(FrozenPacket):
+     summary: str = Field(min_length=5, max_length=1000)
+     steps: tuple[PlanStep, ...] = Field(min_length=1, max_length=12)
+-    files: tuple[str, ...] = Field(min_length=1, max_length=20)
++    files: tuple[str, ...] = Field(
++        min_length=1,
++        max_length=20,
++        description="Exact writable replacement targets only; exclude files merely read or tested.",
++    )
+     test_ids: tuple[str, ...] = Field(min_length=1, max_length=10)
+     risks: tuple[str, ...] = Field(default=(), max_length=12)
+ 
+--- before/src/graph_engineer/prompts.py
++++ after/src/graph_engineer/prompts.py
+@@ -15,16 +15,24 @@
+     "plan": (
+         "Create the smallest next plan that moves every unproved requirement forward. "
+         "Every step must cite supplied evidence IDs and a registered test ID. "
+-        "Describe only tests present in the evidence; do not invent additional cases or suites."
++        "Describe only tests present in the evidence; do not invent additional cases or suites. "
++        "The goal contract and existing tests are authoritative. Never redefine their expected "
++        "behavior. files contains write targets only, not files you will read or tests you run."
+     ),
+     "patch": (
+         "Propose complete replacement content only for approved files. Preserve unrelated "
+-        "behavior. Copy expected_sha256 exactly from the evidence for that file."
++        "behavior and satisfy the unchanged tests, including every concrete example. "
++        "The host supplies the old-file hash; do not output or calculate hashes. "
++        "Keep rationale to one short sentence. Failed tests require an implementation fix, "
++        "never a test edit."
+     ),
+     "review": (
+         "Audit every requirement against test receipts and packet hashes. Mark proved only "
+         "when the supplied evidence directly establishes the requirement. Emit status exactly "
+-        "as lowercase proved, unproved, or contradicted."
++        "as lowercase proved, unproved, or contradicted. Use only exact available_evidence "
++        "strings, not EVID aliases. A requirement about a registered test is proved only by "
++        "that test's zero-exit receipt. Never claim coverage of cases absent from the tests. "
++        "If tests fail, propose an implementation repair; the test contract cannot change."
+     ),
+ }
+ 

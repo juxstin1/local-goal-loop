@@ -1,0 +1,11 @@
+{
+  "python_version": "3.12",
+  "graphs": {
+    "goal_loop": "./src/graph_engineer/graph.py:graph"
+  },
+  "source": {
+    "kind": "uv",
+    "root": "."
+  },
+  "env": ".env"
+}

@@ -1,0 +1,30 @@
+{
+  "state": {
+    "objective": "Complete ticket DESKTOP-REPAIR of Loop Observatory exactly as BRIEF.md specifies. Implement all behavior for this ticket in observatory.py. Read the brief, existing source, and tests in the provided context. Make a usable, thoughtful tool with a complete implementation; leave protected files intact. Use compact code that fits the response limit. Run registered pytest and review its receipt. Additional concrete feedback: Your prior interface passed basic tests but omitted essential user behavior. Replace the duplicated parser/metrics with imports from trace_reader and trace_metrics. Build a genuinely usable dark interface: charcoal background, readable white text, prominent title/subtitle, visible label bound to summary_var, top Open trace and Export summary buttons, horizontal scrollbar wired both ways to canvas, distinct plan/patch/review/error card colors, tag_bind on rectangles AND text for clicks, selected outline that preserves status colors, scrollable detail text. Loading must clear old detail even for empty files, show errors without crashing, and main must honor optional CLI path. Four test_usability.py checks now expose omitted features. All tests including parser regressions must pass. Keep the code compact under 4096 output tokens; prioritize complete behavior and coherent layout.",
+    "repo_root": "C:\\Users\\juxxs\\Desktop\\LoopObservatory",
+    "task_id": "DESKTOP-REPAIR",
+    "thread_id": "observatory-DESKTOP-REPAIR-48e8690a-a863-400c-b7c3-afdcbe596655",
+    "allowed_write_paths": [
+      "observatory.py"
+    ],
+    "registered_test_ids": [
+      "pytest"
+    ],
+    "cycle_budget": 2,
+    "iteration": 0,
+    "status": "active",
+    "repository_fingerprint": "pending",
+    "events": []
+  },
+  "hashes": {
+    "BRIEF.md": "aaaaf3c633c4e7fea850878b229e37d7bb66583fde1d79ddba07061c38776f50",
+    "observatory.py": "dab33187f9320f8a93a407e8d6c6ef0b2e1e05d1a5e6878ce222d3e7f5d27c11",
+    "trace_metrics.py": "2185aea32de08071f66144a1592d229ca6231cf18cbb5fd477c883c90ee14051",
+    "trace_reader.py": "afa57fdd86dbdec25ec102b87212df9ba795871f17d9b8d2041934a7c8bfa429",
+    "samples\\demo.jsonl": "3b1eeb592a9be59049deceb33bbdbf8ac25b0fd8c1bd9edea8681686d9b614f2",
+    "tests\\test_core.py": "dd75dd1018d0783840fe61af07a7d4a638858c413a6069aecaec9444fd65e8a4",
+    "tests\\test_desktop.py": "9549fbf199ac72d3f66d3270ec1c9db1f51c0a67d4657422712bd5b3c36ac198",
+    "tests\\test_robustness.py": "155a63ab6ba3595251cc41c1e5269191cd74ae5ea55d85e304190554d90712d1",
+    "tests\\test_usability.py": "8133ac69765dfbeb601669ec5daecf438694a468db80e9cf502b8bf09debaef4"
+  }
+}

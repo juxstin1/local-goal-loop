@@ -1,0 +1,230 @@
+"""Qwen-owned desktop interface. Implement Observatory and main per BRIEF.md."""
+import json
+import os
+import sys
+import tkinter as tk
+from tkinter import filedialog
+
+from trace_reader import load_trace
+from trace_metrics import summarize
+
+
+class Observatory(tk.Frame):
+    def __init__(self, root):
+        super().__init__(root)
+        self.events = []
+        self.warnings = []
+        self.canvas = tk.Canvas(self, highlightthickness=0)
+        self.detail = tk.Text(self, wrap=tk.WORD)
+        self.summary_var = tk.StringVar()
+        self.warning_count = tk.Label(self, text="0", font=("Arial", 12, "bold"))
+        self._build_ui()
+        self._rect_ids = []
+        self._text_ids = []
+
+    def _build_ui(self):
+        self.master.title("Loop Observatory")
+        self.master.configure(bg="#1a1a1a")
+        self.master.geometry("1000x680")
+        
+        subtitle = tk.Label(self.master, text="Recorded agent activity", font=("Arial", 10, "italic"), bg="#1a1a1a", fg="white")
+        subtitle.pack(pady=5)
+        
+        frame = tk.Frame(self.master, bg="#1a1a1a")
+        frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        self.load_btn = tk.Button(frame, text="Open trace", command=self.load_file, bg="#319795", fg="white", activebackground="#2d3748", activeforeground="white")
+        self.load_btn.pack(side=tk.LEFT, padx=2)
+        self.export_btn = tk.Button(frame, text="Export summary", command=self.export_summary, bg="#319795", fg="white", activebackground="#2d3748", activeforeground="white")
+        self.export_btn.pack(side=tk.LEFT, padx=2)
+        
+        self.canvas.configure(bg="#1a1a1a")
+        self.canvas.pack(fill=tk.BOTH, expand=True)
+        
+        scrollbar = tk.Scrollbar(self.canvas, orient=tk.HORIZONTAL, command=self.canvas.xview)
+        scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
+        self.canvas.configure(xscrollcommand=scrollbar.set)
+        self.canvas.create_window(0, 0, anchor="nw", window=tk.Frame(self.canvas, bg="#1a1a1a"))
+        self.canvas.pack_propagate(False)
+        self.canvas.configure(scrollregion=(0, 0, 1000, 680))
+        
+        self.detail.pack(fill=tk.BOTH, expand=True)
+        self.detail.configure(bg="#1a1a1a", fg="white", insertbackground="white")
+        
+        self.warning_count.pack(side=tk.RIGHT, padx=10)
+        self.summary_var.set("")
+        
+        summary_label = tk.Label(self.master, textvariable=self.summary_var, font=("Arial", 10), bg="#1a1a1a", fg="#38a169")
+        summary_label.pack(pady=5)
+
+    def load_file(self, path=None):
+        if path is None:
+            path = filedialog.askopenfilename(title="Open trace", filetypes=[("JSONL", "*.jsonl")])
+        if not path:
+            return
+        try:
+            with open(path, 'r', encoding='utf-8-sig') as f:
+                lines = f.readlines()
+        except FileNotFoundError:
+            self.warnings.append(f"File not found: {path}")
+            self._update_summary()
+            return
+        self.events = []
+        self.warnings = []
+        self._rect_ids = []
+        self._text_ids = []
+        self.canvas.delete("all")
+        line_num = 0
+        for line in lines:
+            line_num += 1
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                self.warnings.append(f"Malformed JSON at line {line_num}")
+                continue
+            if not isinstance(row, dict):
+                self.warnings.append(f"Non-object row at line {line_num}")
+                continue
+            event = {
+                "line": line_num,
+                "role": row.get("role") or "unknown",
+                "attempt": max(1, row.get("attempt", 1)),
+                "tokens": 0,
+                "status": "ok",
+                "output": ""
+            }
+            response = row.get("response")
+            if response is not None:
+                usage = response.get("usage_metadata") or response.get("response_metadata", {}).get("token_usage")
+                if usage:
+                    event["tokens"] = max(0, usage.get("output_tokens") or usage.get("completion_tokens") or 0)
+                if response.get("tool_calls") and len(response["tool_calls"]) > 0:
+                    event["output"] = json.dumps(response["tool_calls"][0].get("args", {}), indent=2)
+                elif response.get("content"):
+                    event["output"] = response["content"]
+            if row.get("error") or row.get("error_type"):
+                event["status"] = "error"
+                event["output"] = row.get("error") or row.get("error_type")
+            elif row.get("input") and isinstance(row["input"], dict) and row["input"].get("tests"):
+                for test in row["input"]["tests"]:
+                    if isinstance(test, dict) and test.get("exit_code", 0) != 0:
+                        event["status"] = "test-failed"
+                        break
+            self.events.append(event)
+        self._draw_canvas()
+        self._update_summary()
+
+    def _draw_canvas(self):
+        self.canvas.delete("all")
+        self._rect_ids = []
+        self._text_ids = []
+        for i, event in enumerate(self.events):
+            x = 10 + i * 180
+            y = 10
+            width = 170
+            height = 40
+            if event["status"] == "error":
+                color = "#e53e3e"
+            elif event["status"] == "test-failed":
+                color = "#d69e2e"
+            elif event["role"] == "plan":
+                color = "#319795"
+            elif event["role"] == "patch":
+                color = "#38a169"
+            elif event["role"] == "review":
+                color = "#3182ce"
+            else:
+                color = "#4a5568"
+            rect = self.canvas.create_rectangle(x, y, x + width, y + height, fill=color, outline="")
+            self.canvas.tag_bind(rect, "<Button-1>", lambda e, idx=i: self.select_event(idx))
+            self._rect_ids.append(rect)
+            text = self.canvas.create_text(x + 10, y + 15, text=f"{event['role'][:6]} {event['line']}", fill="white")
+            self.canvas.tag_bind(text, "<Button-1>", lambda e, idx=i: self.select_event(idx))
+            self._text_ids.append(text)
+        bbox = self.canvas.bbox("all")
+        if bbox:
+            x, y, width, height = bbox
+            self.canvas.configure(scrollregion=(0, 0, width, height))
+
+    def select_event(self, index):
+        if not self.events:
+            return
+        if index < 0 or index >= len(self.events):
+            return
+        event = self.events[index]
+        self.detail.delete("1.0", tk.END)
+        self.detail.insert(tk.END, f"Role: {event['role']}\n")
+        self.detail.insert(tk.END, f"Status: {event['status']}\n")
+        self.detail.insert(tk.END, f"Line: {event['line']}\n")
+        self.detail.insert(tk.END, f"Attempt: {event['attempt']}\n")
+        self.detail.insert(tk.END, f"Tokens: {event['tokens']}\n")
+        self.detail.insert(tk.END, "\nOutput:\n")
+        output = event.get("output", "")
+        if output:
+            self.detail.insert(tk.END, output)
+        else:
+            self.detail.insert(tk.END, "(no output)")
+        for rect_id in self._rect_ids:
+            self.canvas.itemconfig(rect_id, outline=2)
+        if self._rect_ids:
+            self.canvas.itemconfig(self._rect_ids[index], outline=3)
+        for text_id in self._text_ids:
+            self.canvas.itemconfig(text_id, outline=2)
+        if self._text_ids:
+            self.canvas.itemconfig(self._text_ids[index], outline=3)
+        self._update_summary()
+
+    def export_summary(self, path=None):
+        if path is None:
+            path = filedialog.asksaveasfilename(title="Export summary", filetypes=[("JSON", "*.json")])
+        if not path:
+            return
+        summary = {
+            "summary": {
+                "calls": len(self.events),
+                "errors": sum(1 for e in self.events if e["status"] == "error"),
+                "failed_tests": sum(1 for e in self.events if e["status"] == "test-failed"),
+                "repairs": sum(1 for e in self.events if e["attempt"] > 1),
+                "output_tokens": sum(e["tokens"] for e in self.events),
+                "roles": {}
+            },
+            "warnings": self.warnings
+        }
+        for e in self.events:
+            role = e["role"]
+            summary["summary"]["roles"][role] = summary["summary"]["roles"].get(role, 0) + 1
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(summary, f, indent=2)
+
+    def _update_summary(self):
+        calls = len(self.events)
+        errors = sum(1 for e in self.events if e["status"] == "error")
+        failed_tests = sum(1 for e in self.events if e["status"] == "test-failed")
+        repairs = sum(1 for e in self.events if e["attempt"] > 1)
+        output_tokens = sum(e["tokens"] for e in self.events)
+        roles = {}
+        for e in self.events:
+            role = e["role"]
+            roles[role] = roles.get(role, 0) + 1
+        self.summary_var.set(f"Calls: {calls} | Errors: {errors} | Failed: {failed_tests} | Repairs: {repairs} | Tokens: {output_tokens} | Warnings: {len(self.warnings)}")
+
+
+def main():
+    root = tk.Tk()
+    root.title("Loop Observatory")
+    root.geometry("1000x680")
+    app = Observatory(root)
+    app.pack(fill="both", expand=True)
+    bundled = os.path.join(os.path.dirname(__file__), "samples", "demo.jsonl")
+    if os.path.exists(bundled):
+        app.load_file(bundled)
+    elif len(sys.argv) > 1:
+        app.load_file(sys.argv[1])
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()

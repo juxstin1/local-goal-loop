@@ -1,0 +1,30 @@
+{
+  "state": {
+    "objective": "Complete ticket DESKTOP-REBUILD of Loop Observatory exactly as BRIEF.md specifies. Implement all behavior for this ticket in observatory.py. Read the brief, existing source, and tests in the provided context. Make a usable, thoughtful tool with a complete implementation; leave protected files intact. Use compact code that fits the response limit. Run registered pytest and review its receipt. Additional concrete feedback: Implement a fresh compact Observatory class from the empty stub. Prior UI was discarded after preserving its failed source; do not recreate its duplicated parser. IMPORT load_trace from trace_reader and summarize from trace_metrics and USE THEM. load_file: call load_trace, replace events/warnings, clear detail, draw, update summary. export_summary: dump summary and warnings. Layout INSIDE self: title/subtitle and buttons, summary label bound to summary_var, canvas height 110 with horizontal scrollbar, expanding detail text with vertical scrollbar. Dark backgrounds and light text. Cards each have one shared tag for rectangle and text, distinct role/status colors, click callback to select_event. Set scrollregion=canvas.bbox(all) after drawing. Selection changes rectangle OUTLINE COLOR and WIDTH ONLY; do not set outline on canvas text. main honors sys.argv[1] or bundled demo. Catch OSError and UnicodeError and show message in UI. Complete all test contracts and make it pleasant to use.",
+    "repo_root": "C:\\Users\\juxxs\\Desktop\\LoopObservatory",
+    "task_id": "DESKTOP-REBUILD",
+    "thread_id": "observatory-DESKTOP-REBUILD-6b83f41c-47ca-4f8b-b8f2-0398768d9810",
+    "allowed_write_paths": [
+      "observatory.py"
+    ],
+    "registered_test_ids": [
+      "pytest"
+    ],
+    "cycle_budget": 2,
+    "iteration": 0,
+    "status": "active",
+    "repository_fingerprint": "pending",
+    "events": []
+  },
+  "hashes": {
+    "BRIEF.md": "aaaaf3c633c4e7fea850878b229e37d7bb66583fde1d79ddba07061c38776f50",
+    "observatory.py": "055389569ce5f995a6f4dd35596beb9e14c2f80852163b9a6af64b802d80624b",
+    "trace_metrics.py": "2185aea32de08071f66144a1592d229ca6231cf18cbb5fd477c883c90ee14051",
+    "trace_reader.py": "afa57fdd86dbdec25ec102b87212df9ba795871f17d9b8d2041934a7c8bfa429",
+    "samples\\demo.jsonl": "3b1eeb592a9be59049deceb33bbdbf8ac25b0fd8c1bd9edea8681686d9b614f2",
+    "tests\\test_core.py": "dd75dd1018d0783840fe61af07a7d4a638858c413a6069aecaec9444fd65e8a4",
+    "tests\\test_desktop.py": "9549fbf199ac72d3f66d3270ec1c9db1f51c0a67d4657422712bd5b3c36ac198",
+    "tests\\test_robustness.py": "155a63ab6ba3595251cc41c1e5269191cd74ae5ea55d85e304190554d90712d1",
+    "tests\\test_usability.py": "ad08d65a0f8b440dd3cacfe5c04c6fb5bb774e5c95497fef6c6d3a201f9abda8"
+  }
+}

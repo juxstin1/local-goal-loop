@@ -1,0 +1,188 @@
+{
+  "passed": 15,
+  "total": 15,
+  "results": [
+    {
+      "name": "non-container response",
+      "passed": true,
+      "expected": {
+        "tokens": 0,
+        "output": ""
+      },
+      "actual": {
+        "tokens": 0,
+        "output": ""
+      }
+    },
+    {
+      "name": "non-container usage",
+      "passed": true,
+      "expected": {
+        "tokens": 0
+      },
+      "actual": {
+        "tokens": 0
+      }
+    },
+    {
+      "name": "non-container metadata",
+      "passed": true,
+      "expected": {
+        "tokens": 0
+      },
+      "actual": {
+        "tokens": 0
+      }
+    },
+    {
+      "name": "non-object tool call",
+      "passed": true,
+      "expected": {
+        "output": ""
+      },
+      "actual": {
+        "output": ""
+      }
+    },
+    {
+      "name": "non-container tests",
+      "passed": true,
+      "expected": {
+        "status": "ok"
+      },
+      "actual": {
+        "status": "ok"
+      }
+    },
+    {
+      "name": "non-integer exit",
+      "passed": true,
+      "expected": {
+        "status": "ok"
+      },
+      "actual": {
+        "status": "ok"
+      }
+    },
+    {
+      "name": "invalid role and attempt",
+      "passed": true,
+      "expected": {
+        "role": "unknown",
+        "attempt": 1
+      },
+      "actual": {
+        "role": "unknown",
+        "attempt": 1
+      }
+    },
+    {
+      "name": "negative tokens with fallback",
+      "passed": true,
+      "expected": {
+        "tokens": 13
+      },
+      "actual": {
+        "tokens": 13
+      }
+    },
+    {
+      "name": "zero tokens takes precedence",
+      "passed": true,
+      "expected": {
+        "tokens": 0
+      },
+      "actual": {
+        "tokens": 0
+      }
+    },
+    {
+      "name": "non-text content",
+      "passed": true,
+      "expected": {
+        "output": ""
+      },
+      "actual": {
+        "output": ""
+      }
+    },
+    {
+      "name": "C:\\Users\\juxxs\\Desktop\\LoopObservatory\\samples\\demo.jsonl",
+      "passed": true,
+      "summary": {
+        "calls": 6,
+        "errors": 0,
+        "failed_tests": 2,
+        "repairs": 0,
+        "output_tokens": 1581,
+        "roles": {
+          "plan": 2,
+          "patch": 2,
+          "review": 2
+        }
+      }
+    },
+    {
+      "name": "C:\\Users\\juxxs\\Desktop\\LoopObservatory-build\\CORE\\trace.jsonl",
+      "passed": true,
+      "summary": {
+        "calls": 6,
+        "errors": 0,
+        "failed_tests": 1,
+        "repairs": 0,
+        "output_tokens": 2868,
+        "roles": {
+          "plan": 2,
+          "patch": 2,
+          "review": 2
+        }
+      }
+    },
+    {
+      "name": "C:\\Users\\juxxs\\Desktop\\LoopObservatory-build\\CORE-REPAIR\\trace.jsonl",
+      "passed": true,
+      "summary": {
+        "calls": 6,
+        "errors": 0,
+        "failed_tests": 1,
+        "repairs": 0,
+        "output_tokens": 3216,
+        "roles": {
+          "plan": 2,
+          "patch": 2,
+          "review": 2
+        }
+      }
+    },
+    {
+      "name": "C:\\Users\\juxxs\\Desktop\\LoopObservatory-build\\DESKTOP\\trace.jsonl",
+      "passed": true,
+      "summary": {
+        "calls": 6,
+        "errors": 0,
+        "failed_tests": 1,
+        "repairs": 0,
+        "output_tokens": 5363,
+        "roles": {
+          "plan": 2,
+          "patch": 2,
+          "review": 2
+        }
+      }
+    },
+    {
+      "name": "C:\\Users\\juxxs\\Desktop\\LoopObservatory-build\\DESKTOP-REPAIR\\trace.jsonl",
+      "passed": true,
+      "summary": {
+        "calls": 1,
+        "errors": 0,
+        "failed_tests": 0,
+        "repairs": 0,
+        "output_tokens": 437,
+        "roles": {
+          "plan": 1
+        }
+      }
+    }
+  ]
+}

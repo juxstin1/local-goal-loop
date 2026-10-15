@@ -1,0 +1,42 @@
+[project]
+name = "local-graph-engineer"
+version = "0.1.0"
+description = "A persistent local-model engineering goal loop built with LangGraph"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "langchain>=1.2,<2",
+    "langchain-openai>=1.1,<2",
+    "langgraph-checkpoint-sqlite>=3,<4",
+    "langgraph==1.2.11",
+    "pydantic>=2.10,<3",
+]
+
+[project.scripts]
+graph-engineer = "graph_engineer.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3,<10",
+    "ruff>=0.12,<1",
+]
+
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["graph_engineer"]
+
+[tool.setuptools.package-dir]
+"graph_engineer" = "src/graph_engineer"
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
