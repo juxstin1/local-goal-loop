@@ -1,59 +1,55 @@
-# Local Goal Loop
+<p align="center"><img src="docs/media/banner.png" alt="Local Goal Loop" width="100%"></p>
 
-A local-model engineering loop built with LangGraph and llama.cpp: plan, approve,
-patch, test, review, and stop at a bounded revision limit.
+**A local-model engineering loop where the host owns files, tests and completion, and the model only proposes.**
 
-The host controls file access, hashes, approval gates, registered tests, SQLite
-checkpoints, and completion. The model proposes structured plans, replacement
-files, and reviews. A completion receipt proves only the supplied tests passed.
+<p align="center"><img src="docs/media/harness-fix.png" alt="Fixture completion before and after a harness fix" width="100%"></p>
 
-## What's here
+*Same 10 frozen fixtures, same local Qwen3.5-9B Q4_K_M, before and after a harness fix. Built from [`comparison.json`](evidence/2026-10-15-harness-fix/comparison.json).*
 
-- `src/graph_engineer/`, `tests/`, `fixtures/`: the engine and deterministic tests.
-- `scripts/`: local server launch and evidence collection helpers.
-- `evidence/2026-10-15-harness-fix/`: the earlier 7/10 → 9/10 fixture comparison.
-- `experiments/LoopObservatory/`: the model-authored desktop prototype. **It failed
-  acceptance: 20/24 tests passed; clicking and scrolling were broken.**
-- `experiments/LoopObservatory-build/`: all seven build attempts, raw traces,
-  checkpoints, screenshots, results, and the readable [model output transcript](experiments/LoopObservatory-build/MODEL-OUTPUTS.txt).
-- [Handoff](experiments/LoopObservatory/HANDOFF.txt): exact defects and continuation steps.
-- `docs/`: original specification, historical evaluation, and source README.
+## What it does
 
-The Observatory experiment recorded 39 call records, 36,376 reported output tokens,
-and 578.38 seconds summed ticket runtime. It was supervised and did not produce a
-working app. The initial small test suite passing was insufficient evidence.
+- Runs a LangGraph loop: plan, approve, patch, approve, test, review, stop at a bounded revision limit.
+- The model proposes structured plans, replacement files and reviews.
+- The host reads files, hashes originals, runs registered tests and decides completion.
+- Approval gates follow the plan and the patch.
+- Progress is saved in SQLite checkpoints.
+- Talks to a local llama.cpp server through an OpenAI-compatible endpoint.
 
-## Install and test
+## Results
 
-Requires Python 3.12 and uv. Run from this repository's root:
+- Harness fix, 10 frozen fixtures, one live run: 7/10 before, 9/10 after. Time dropped from 299 s to 120 s. Source: [`comparison.json`](evidence/2026-10-15-harness-fix/comparison.json).
+- The remaining failure is FIX-007. The model lowercased output keys but counted the original case-sensitive input, and repeated the error on its one revision. pytest failed and completion stayed false.
+- The run is not a clean run (`clean_run: false`). It makes no claim of general repository capability or statistical reliability.
+- **Failed experiment: LoopObservatory.** A model-authored desktop app built through the loop over seven build attempts. It failed acceptance: 20/24 tests passed, and clicking and scrolling were broken.
+- The small test suite that passed first was not enough evidence. Defects: [`HANDOFF.txt`](experiments/LoopObservatory/HANDOFF.txt). Build record: [`build-summary.json`](experiments/LoopObservatory-build/build-summary.json), [model outputs](experiments/LoopObservatory-build/MODEL-OUTPUTS.txt).
+- Observatory totals: 39 call records, 36,376 reported output tokens, 578.38 s summed ticket runtime. Supervised.
+- A completion receipt proves only that the supplied tests passed.
+
+## How it works
+
+```
+objective -> plan -> approval -> patch -> approval -> registered tests -> review
+                ^                                                          |
+                +------------- revise, up to the bound --------------------+
+```
+
+1. The host fixes the goal contract from the objective and the registered tests.
+2. The model sees the contract, the test source and the write restrictions.
+3. The host checks hashes and applies approved files only.
+4. The host runs the registered tests and checks protected files before and after.
+5. Completion needs unchanged registered tests passing with receipts cited.
+
+## Quick start
+
+Needs Python 3.12 and uv. The 115 tests are deterministic and use no model.
 
 ```powershell
 uv sync --frozen
 uv run pytest
 uv run ruff check src tests scripts
-uv run ruff format --check src tests scripts
 ```
 
-The root test command checks the engine. The preserved failing experiment has its
-own tests, deliberately outside that suite:
-
-Extraction verification: **115 engine tests passed**, lint passed, and all 20
-engine/test/helper Python files passed the formatter check. No live model run was
-made for this repository packaging step.
-
-```powershell
-Push-Location experiments/LoopObservatory
-uv run --project ../.. python -m pytest -q tests
-Pop-Location
-```
-
-Tkinter is required for the experiment. The original environment occasionally
-failed while initializing multiple Tk roots; see the saved test-correction note.
-
-## Run with a local model
-
-Start your own llama.cpp server with a compatible GGUF model, then set the actual
-endpoint and served alias. For the recorded session they were:
+Live runs need your own llama.cpp server and GGUF model. Weights are not included.
 
 ```powershell
 $env:LOCAL_MODEL_BASE_URL = 'http://127.0.0.1:8089/v1'
@@ -62,21 +58,24 @@ uv run graph-engineer demo --auto-approve
 uv run graph-engineer evaluate --receipt-path .runtime/evaluation.json
 ```
 
-The demo edits a temporary fixture. Omit `--auto-approve` to review its gates.
-Server binaries, model weights, environments, and credentials are not included.
-The older `probe` command and PowerShell server helpers use port 8080; the model
-client uses `LOCAL_MODEL_BASE_URL`. `.env.example` documents settings but shell
-commands require exported environment variables.
+Commands: `probe`, `demo`, `evaluate`. Omit `--auto-approve` to review the gates. More setup notes and provenance: [docs/DETAILS.md](docs/DETAILS.md).
 
-## Provenance
+## Layout
 
-This repo was extracted from `langgraph/examples/local-graph-engineer` plus the
-separate Observatory experiment. The engine now installs published LangGraph
-1.2.11 instead of editable sibling paths; `uv.lock` pins the standalone resolution.
-The historical collector paths were adjusted for this layout. The original
-LangGraph checkout and all model-authored experiment code were left untouched.
+- `src/graph_engineer/`: graph, model client, packets, execution, CLI.
+- `tests/`, `fixtures/`: deterministic tests and frozen tasks.
+- `scripts/`: server launch and evidence collection.
+- `evidence/`: harness-fix receipts, traces and checkpoints.
+- `experiments/LoopObservatory*/`: the failed app and all build attempts.
+- `docs/`: specification, evaluation proof, extended notes.
 
-Saved receipts contain historical local paths and PIDs; treat them as evidence,
-not current runtime configuration. Some archived helper scripts retain original
-workspace paths. The legacy historical source-hash gate predates this extraction.
-Runtime traces may contain task/source text; this repository was created private.
+## Status
+
+- Engine, fixtures and evidence are in place.
+- 9/10 fixtures completed in the latest recorded run. One failed.
+- The Observatory app does not work and is kept as evidence.
+- Next: fix FIX-007 and the Observatory defects listed in HANDOFF.txt.
+
+## License
+
+See [LICENSE](LICENSE).
